@@ -45,7 +45,7 @@ export const SceneHook: React.FC = () => {
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 34}}>
       <BlurText text="Introducing" fontFamily={F.lookingFor} fontSize={64} fontWeight={700} color={C.teal900} start={2} stagger={7} variant="letters" shine float={3} />
       <BlurText
-        text="Introvert App & Developer"
+        text="Introvert - App & Web Developer"
         fontFamily={F.headline}
         fontSize={108}
         fontWeight={900}
