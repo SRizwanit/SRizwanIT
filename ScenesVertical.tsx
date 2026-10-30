@@ -1,10 +1,10 @@
 // 9:16 VERTICAL scenes (1080x1920). Same story, same timing, same audio as the 16:9 video.
 // Only the LAYOUT is different. Rendered as HD only (1080x1920).
 import React from 'react';
-import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START} from './theme';
+import {AbsoluteFill, Easing, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START, SCENE, TRANSITION} from './theme';
 import {F} from './fonts';
-import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle} from './Components';
+import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Particles, Smile, Squiggle, SkillOrbit} from './Components';
 import {SKILLS} from './Icons';
 
 import me from './mypicture.jpg';
@@ -19,8 +19,9 @@ import webS2 from './web-islami-bishwakosh-s2.jpg';
 import webAI from './web-islamipedia-ai.jpg';
 import webTask from './web-rizwantask.jpg';
 
+const EXIT = (k: keyof typeof SCENE) => SCENE[k] - TRANSITION - 14; // text exit starts 14 frames before the cross-fade
 const fadeIn = (frame: number, start: number, dur = 18) =>
-  interpolate(frame - start, [0, dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  interpolate(frame - start, [0, dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
 
 /* Portrait card: the cartoon keeps its own white bg + "Rizwan" signature */
 const Portrait: React.FC<{size: number; style?: React.CSSProperties}> = ({size, style}) => (
@@ -45,11 +46,10 @@ export const SceneHookV: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 44}}>
-      <div style={{fontFamily: F.lookingFor, fontWeight: 500, fontSize: 64, color: C.teal900, opacity: fadeIn(frame, 4), transform: `translateY(${(1 - fadeIn(frame, 4)) * 20}px)`}}>
-        Introducing
-      </div>
+      <Particles offset={START.hook} tone="light" seed="hook" />
+      <BlurText text="Introducing" fontFamily={F.lookingFor} fontSize={64} fontWeight={500} color={C.teal900} mode="chars" start={4} stagger={3} shine float={3} exitAt={EXIT('hook')} />
       <BlurText
-        text="Introvert App & Developer"
+        text="Introvert App & Developer" mode="flip" shine float={4} exitAt={EXIT('hook')}
         fontFamily={F.headline}
         fontSize={104}
         fontWeight={900}
@@ -100,6 +100,7 @@ export const SceneIntroV: React.FC = () => {
           top: TOP,
           transform: `translateY(${(1 - enter) * -700}px) rotate(${(1 - enter) * -8}deg)`,
           opacity: Math.min(1, enter * 2),
+          zIndex: 10,
         }}
       >
         <div style={{transform: `scale(${1 + 0.18 * zoom})`}}>
@@ -107,10 +108,13 @@ export const SceneIntroV: React.FC = () => {
         </div>
       </div>
 
+      {/* skills orbit around the head: back half passes behind the portrait, front half in front */}
+      <SkillOrbit items={SKILLS} cx={540} cy={TOP + 100 - 30 * zoom} rx={380 + 60 * zoom} ry={55} chip={100} start={34} speed={1.2} />
+
       {/* pop-ups float up around the photo */}
-      <Badge icon="app" text="Android & iOS Apps" delay={FOCUS + 22} style={{left: 560, top: 170}} />
-      <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{left: 40, top: 820}} />
-      <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 600, top: 850}} />
+      <Badge icon="app" text="Android & iOS Apps" delay={FOCUS + 22} style={{zIndex: 30, left: 40, top: 560}} />
+      <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{zIndex: 30, left: 40, top: 820}} />
+      <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{zIndex: 30, left: 600, top: 850}} />
 
       {/* text block (centered): name first, then role + CTA appear under it */}
       <div
@@ -129,14 +133,12 @@ export const SceneIntroV: React.FC = () => {
           <span style={{width: 12, height: 12, borderRadius: 6, background: C.teal700}} />
           Introvert by choice
         </div>
-        <BlurText text="Hello, I'm" fontFamily={F.hello} fontSize={100} fontWeight={800} color={C.slate} start={26} stagger={8} style={{marginTop: 24}} />
-        <BlurText text="Rizwan" fontFamily={F.name} fontSize={170} fontWeight={900} color={C.teal500} start={44} stagger={8} style={{marginTop: -10}} />
-        <BlurText text="Chowdhury" fontFamily={F.name} fontSize={110} fontWeight={700} color={C.slate} start={58} stagger={8} style={{marginTop: -6}} />
+        <BlurText text="Hello, I'm" mode="mask" fontFamily={F.hello} fontSize={100} fontWeight={800} color={C.slate} start={26} stagger={8} style={{marginTop: 24}} />
+        <BlurText text="Rizwan" mode="chars" shine float={3} gradient={[C.teal500, C.teal700]} fontFamily={F.name} fontSize={170} fontWeight={900} color={C.teal500} start={44} stagger={8} style={{marginTop: -10}} />
+        <BlurText text="Chowdhury" mode="mask" fontFamily={F.name} fontSize={110} fontWeight={700} color={C.slate} start={58} stagger={8} style={{marginTop: -6}} />
         <Squiggle width={460} start={80} duration={25} style={{marginTop: 4}} />
-        <BlurText text="App & Website Developer" fontFamily={F.role} fontSize={52} fontWeight={800} color={C.teal700} start={FOCUS + 30} stagger={6} style={{marginTop: 18}} />
-        <div style={{fontFamily: F.bn, fontWeight: 700, fontSize: 36, color: C.slate, marginTop: 8, opacity: fadeIn(frame, FOCUS + 55)}}>
-          অ্যাপ ও ওয়েবসাইট ডেভেলপার
-        </div>
+        <BlurText text="App & Website Developer" mode="flip" fontFamily={F.role} fontSize={52} fontWeight={800} color={C.teal700} start={FOCUS + 30} stagger={6} style={{marginTop: 18}} />
+        <BlurText text="অ্যাপ ও ওয়েবসাইট ডেভেলপার" mode="blur" fontFamily={F.bn} fontSize={36} fontWeight={700} color={C.slate} start={FOCUS + 55} stagger={6} style={{marginTop: 8}} />
         <CTA text="See My Work" delay={FOCUS + 75} style={{marginTop: 30}} />
       </div>
     </AbsoluteFill>
@@ -178,7 +180,7 @@ export const SceneAppsV: React.FC = () => {
     <AbsoluteFill>
       <GridBG offset={START.apps} />
       <div style={{position: 'absolute', top: 150, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <BlurText text="Apps" fontFamily={F.titleApps} fontSize={130} fontWeight={900} color={C.teal700} start={0} />
+        <BlurText text="Apps" mode="chars" shine float={3} exitAt={EXIT('apps')} fontFamily={F.titleApps} fontSize={130} fontWeight={900} color={C.teal700} start={0} />
         <Squiggle width={300} start={14} />
       </div>
       <div style={{position: 'absolute', top: 400, bottom: 220, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 70}}>
@@ -198,7 +200,7 @@ export const SceneWebV: React.FC = () => {
   const mid = {w: 370, h: 663};
   const cap = (txt: string, font: string, size: number, width: number): React.ReactNode => (
     <div style={{width, textAlign: 'center', fontFamily: font, fontWeight: 700, fontSize: size, color: C.slate, lineHeight: 1.25, marginTop: 16}}>
-      {txt}
+      <BlurText text={txt} mode="blur" fontFamily={font} fontSize={size} fontWeight={700} color={C.slate} start={40} stagger={5} />
     </div>
   );
   const col: React.CSSProperties = {display: 'flex', flexDirection: 'column', alignItems: 'center'};
@@ -206,7 +208,7 @@ export const SceneWebV: React.FC = () => {
     <AbsoluteFill>
       <GridBG offset={START.web} />
       <div style={{position: 'absolute', top: 150, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-        <BlurText text="Websites" fontFamily={F.titleWeb} fontSize={130} fontWeight={800} color={C.teal700} start={0} />
+        <BlurText text="Websites" mode="chars" shine float={3} exitAt={EXIT('web')} fontFamily={F.titleWeb} fontSize={130} fontWeight={800} color={C.teal700} start={0} />
         <Squiggle width={300} start={14} />
       </div>
 
@@ -237,7 +239,7 @@ export const SceneSkillsV: React.FC = () => (
   <AbsoluteFill>
     <GridBG offset={START.skills} />
     <div style={{position: 'absolute', top: 150, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-      <BlurText text="Skills" fontFamily={F.cta} fontSize={130} fontWeight={700} color={C.teal700} start={0} />
+      <BlurText text="Skills" mode="chars" shine float={3} exitAt={EXIT('skills')} fontFamily={F.cta} fontSize={130} fontWeight={700} color={C.teal700} start={0} />
       <Squiggle width={300} start={14} />
     </div>
     <div style={{position: 'absolute', top: 430, bottom: 220, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 70}}>
@@ -263,9 +265,8 @@ export const SceneOutroV: React.FC = () => {
   const rise = (start: number) => ({opacity: fadeIn(frame, start), transform: `translateY(${(1 - fadeIn(frame, start)) * 24}px)`});
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-      <div style={{...rise(2), fontFamily: F.dm, fontSize: 140, lineHeight: 1, letterSpacing: 12, color: C.slate}}>
-        Please
-      </div>
+      <Particles offset={START.outro} tone="light" seed="outro" />
+      <BlurText text="Please" mode="mask" fontFamily={F.dm} fontSize={140} fontWeight={400} color={C.slate} start={2} stagger={5} style={{lineHeight: 1, letterSpacing: 12}} />
       <div
         style={{
           fontFamily: F.dm,
@@ -288,12 +289,8 @@ export const SceneOutroV: React.FC = () => {
         (I’ll reply when I’m in the mood
         <Smile size={38} />)
       </div>
-      <div style={{...rise(62), fontFamily: F.fullName, fontWeight: 700, fontSize: 92, color: C.slate, marginTop: 70}}>
-        Rizwan Chowdhury
-      </div>
-      <div style={{...rise(78), fontFamily: F.tagline, fontWeight: 800, fontSize: 28, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.slate, marginTop: 10}}>
-        App &amp; Website Developer
-      </div>
+      <BlurText text="Rizwan Chowdhury" mode="chars" fontFamily={F.fullName} fontSize={92} fontWeight={700} color={C.slate} start={62} stagger={2} duration={18} style={{marginTop: 70}} />
+      <BlurText text="App & Website Developer" mode="mask" fontFamily={F.tagline} fontSize={28} fontWeight={800} color={C.slate} start={78} stagger={6} style={{letterSpacing: '0.2em', textTransform: 'uppercase', marginTop: 10}} />
       <Squiggle width={300} color={C.slate} start={92} style={{marginTop: 14}} />
       <ContactRow start={98} size={34} direction="column" style={{marginTop: 30}} />
     </AbsoluteFill>

@@ -28,10 +28,14 @@ const hits: Hit[] = [
   // S2 — "Rizwan" name appears
   {at: START.intro + 44, src: ding, vol: 0.5, len: 30},
 
-  // S3 — badges + CTA
-  {at: START.intro + 149, src: pop, vol: 0.6, len: 10},
-  {at: START.intro + 161, src: pop, vol: 0.6, len: 10},
-  {at: START.intro + 181, src: ding, vol: 0.5, len: 30},
+  // S2 — skill orbit chips fly in one by one (SkillOrbit: start 34, +4 delay, 6 frames apart)
+  ...Array.from({length: 5}, (_, i): Hit => ({at: START.intro + 34 + 4 + i * 6, src: pop, vol: 0.3, len: 10})),
+
+  // S3 — badges (FOCUS 105 + 22/36/50) + CTA (FOCUS + 75), same frames as the animation
+  {at: START.intro + 127, src: pop, vol: 0.6, len: 10},
+  {at: START.intro + 141, src: pop, vol: 0.6, len: 10},
+  {at: START.intro + 155, src: pop, vol: 0.6, len: 10},
+  {at: START.intro + 180, src: ding, vol: 0.5, len: 30},
 
   // S4 — 7 app cards pop in (same timing constants as the cards)
   ...Array.from({length: 7}, (_, i): Hit => ({at: START.apps + APP_FIRST + i * APP_STAGGER, src: pop, vol: i === 6 ? 0.6 : 0.55, len: 10})),
