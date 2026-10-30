@@ -2,9 +2,9 @@
 // Only the LAYOUT is different. Rendered as HD only (1080x1920).
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START, STATS} from './theme';
+import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START} from './theme';
 import {F} from './fonts';
-import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle, StatChip} from './Components';
+import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle} from './Components';
 import {SKILLS} from './Icons';
 
 import me from './mypicture.jpg';
@@ -46,7 +46,7 @@ export const SceneHookV: React.FC = () => {
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 44}}>
       <div style={{fontFamily: F.lookingFor, fontWeight: 500, fontSize: 64, color: C.teal900, opacity: fadeIn(frame, 4), transform: `translateY(${(1 - fadeIn(frame, 4)) * 20}px)`}}>
-        Looking for
+        Introducing
       </div>
       <BlurText
         text="Introvert App & Developer"
@@ -108,7 +108,7 @@ export const SceneIntroV: React.FC = () => {
       </div>
 
       {/* pop-ups float up around the photo */}
-      <Badge icon="app" text="Android Apps" delay={FOCUS + 22} style={{left: 600, top: 170}} />
+      <Badge icon="app" text="Android & iOS Apps" delay={FOCUS + 22} style={{left: 560, top: 170}} />
       <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{left: 40, top: 820}} />
       <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 600, top: 850}} />
 
@@ -129,12 +129,12 @@ export const SceneIntroV: React.FC = () => {
           <span style={{width: 12, height: 12, borderRadius: 6, background: C.teal700}} />
           Introvert by choice
         </div>
-        <BlurText text="Hello, I'm" fontFamily={F.hello} fontSize={100} fontWeight={800} color={C.teal900} start={26} stagger={8} style={{marginTop: 24}} />
+        <BlurText text="Hello, I'm" fontFamily={F.hello} fontSize={100} fontWeight={800} color={C.slate} start={26} stagger={8} style={{marginTop: 24}} />
         <BlurText text="Rizwan" fontFamily={F.name} fontSize={170} fontWeight={900} color={C.teal500} start={44} stagger={8} style={{marginTop: -10}} />
-        <BlurText text="Chowdhury" fontFamily={F.name} fontSize={110} fontWeight={700} color={C.teal900} start={58} stagger={8} style={{marginTop: -6}} />
+        <BlurText text="Chowdhury" fontFamily={F.name} fontSize={110} fontWeight={700} color={C.slate} start={58} stagger={8} style={{marginTop: -6}} />
         <Squiggle width={460} start={80} duration={25} style={{marginTop: 4}} />
         <BlurText text="App & Website Developer" fontFamily={F.role} fontSize={52} fontWeight={800} color={C.teal700} start={FOCUS + 30} stagger={6} style={{marginTop: 18}} />
-        <div style={{fontFamily: F.bn, fontWeight: 700, fontSize: 36, color: C.teal900, marginTop: 8, opacity: fadeIn(frame, FOCUS + 55)}}>
+        <div style={{fontFamily: F.bn, fontWeight: 700, fontSize: 36, color: C.slate, marginTop: 8, opacity: fadeIn(frame, FOCUS + 55)}}>
           অ্যাপ ও ওয়েবসাইট ডেভেলপার
         </div>
         <CTA text="See My Work" delay={FOCUS + 75} style={{marginTop: 30}} />
@@ -197,7 +197,7 @@ export const SceneWebV: React.FC = () => {
   const side = {w: 262, h: 470};
   const mid = {w: 370, h: 663};
   const cap = (txt: string, font: string, size: number, width: number): React.ReactNode => (
-    <div style={{width, textAlign: 'center', fontFamily: font, fontWeight: 700, fontSize: size, color: C.teal900, lineHeight: 1.25, marginTop: 16}}>
+    <div style={{width, textAlign: 'center', fontFamily: font, fontWeight: 700, fontSize: size, color: C.slate, lineHeight: 1.25, marginTop: 16}}>
       {txt}
     </div>
   );
@@ -213,7 +213,7 @@ export const SceneWebV: React.FC = () => {
       <div style={{position: 'absolute', top: 395, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20}}>
         {/* centre (main) phone: slow push-in so the small text becomes readable */}
         <div style={col}>
-          <PhoneMock src={webAI} imgRatio={1371 / 720} width={mid.w} height={mid.h} delay={0} scrollStart={34} scrollDuration={125} tilt={0} statusBg="#f7f7f7" statusFg={C.teal900} zoomTo={1.3} focusY={0.5} />
+          <PhoneMock src={webAI} imgRatio={1371 / 720} width={mid.w} height={mid.h} delay={0} scrollStart={34} scrollDuration={125} tilt={0} statusBg="#f7f7f7" statusFg={C.slate} zoomTo={1.3} focusY={0.5} />
           {cap('IslamiPedia AI', F.hello, 38, mid.w)}
         </div>
         {/* two supporting phones, side by side below it */}
@@ -251,10 +251,6 @@ export const SceneSkillsV: React.FC = () => (
           <SkillCard key={k.label} icon={k.icon} label={k.label} size={270} labelSize={36} delay={SKILL_FIRST + (i + 3) * SKILL_STAGGER} />
         ))}
       </div>
-      <div style={{display: 'flex', gap: 30}}>
-        <StatChip value={STATS.apps} label="Apps" delay={62} fontSize={40} />
-        <StatChip value={STATS.websites} label="Websites" delay={74} fontSize={40} />
-      </div>
     </div>
   </AbsoluteFill>
 );
@@ -267,7 +263,7 @@ export const SceneOutroV: React.FC = () => {
   const rise = (start: number) => ({opacity: fadeIn(frame, start), transform: `translateY(${(1 - fadeIn(frame, start)) * 24}px)`});
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-      <div style={{...rise(2), fontFamily: F.dm, fontSize: 140, lineHeight: 1, letterSpacing: 12, color: C.teal900}}>
+      <div style={{...rise(2), fontFamily: F.dm, fontSize: 140, lineHeight: 1, letterSpacing: 12, color: C.slate}}>
         Please
       </div>
       <div
@@ -288,17 +284,17 @@ export const SceneOutroV: React.FC = () => {
         <br />
         Now.
       </div>
-      <div style={{...rise(40), fontFamily: F.tagline, fontWeight: 600, fontSize: 38, color: C.teal900, marginTop: 40, display: 'flex', alignItems: 'center', gap: 10}}>
-        (I’ll reply when I’m ready
+      <div style={{...rise(40), fontFamily: F.tagline, fontWeight: 600, fontSize: 38, color: C.slate, marginTop: 40, display: 'flex', alignItems: 'center', gap: 10}}>
+        (I’ll reply when I’m in the mood
         <Smile size={38} />)
       </div>
-      <div style={{...rise(62), fontFamily: F.fullName, fontWeight: 700, fontSize: 92, color: C.teal900, marginTop: 70}}>
+      <div style={{...rise(62), fontFamily: F.fullName, fontWeight: 700, fontSize: 92, color: C.slate, marginTop: 70}}>
         Rizwan Chowdhury
       </div>
-      <div style={{...rise(78), fontFamily: F.tagline, fontWeight: 800, fontSize: 28, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.teal900, marginTop: 10}}>
+      <div style={{...rise(78), fontFamily: F.tagline, fontWeight: 800, fontSize: 28, letterSpacing: '0.2em', textTransform: 'uppercase', color: C.slate, marginTop: 10}}>
         App &amp; Website Developer
       </div>
-      <Squiggle width={300} color={C.teal900} start={92} style={{marginTop: 14}} />
+      <Squiggle width={300} color={C.slate} start={92} style={{marginTop: 14}} />
       <ContactRow start={98} size={34} direction="column" style={{marginTop: 30}} />
     </AbsoluteFill>
   );

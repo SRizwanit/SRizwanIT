@@ -41,10 +41,8 @@ const hits: Hit[] = [
   {at: START.web + 8, src: pop, vol: 0.6, len: 10},
   {at: START.web + 16, src: pop, vol: 0.6, len: 10},
 
-  // S6 — 5 skill cards pop in, then the two counters
+  // S6 — 5 skill cards pop in
   ...Array.from({length: 5}, (_, i): Hit => ({at: START.skills + SKILL_FIRST + i * SKILL_STAGGER, src: pop, vol: 0.5, len: 10})),
-  {at: START.skills + 62, src: pop, vol: 0.55, len: 10},
-  {at: START.skills + 74, src: ding, vol: 0.45, len: 30},
 
   // S7 — "Don't DM Now." stamp, reply line, name
   {at: START.outro + 12, src: thud, vol: 0.95, len: 30},

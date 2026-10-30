@@ -12,7 +12,8 @@ export const F_HEIGHT = 1350;
 export const FPS = 30;
 
 export const C = {
-  teal900: '#04302E',
+  teal900: '#4A2C17', // used ONLY by the hook word "Introducing": warm espresso brown (was #04302E -> #073B4C)
+  slate: '#2B1B12', //   deep charcoal-espresso: ALL other dark text/icons (warm counter-tone to teal, pairs with gold)
   teal700: '#0B6E6A',
   teal500: '#0FA3A0',
   teal300: '#5EEAD4',
@@ -28,11 +29,11 @@ export const C = {
 // DURATION = sum(durations) - (scenes-1)*TRANSITION  (computed, no magic number).
 export const TRANSITION = 12;
 export const SCENE = {
-  hook: 120, //   S1  Looking for introvert App & Developer
+  hook: 120, //   S1  Introducing introvert App & Developer
   intro: 258, //  S2+S3 ONE continuous scene: Hello I'm Rizwan -> focus on photo -> pop-ups, role, CTA
-  apps: 255, //   S4  7 apps
-  web: 185, //    S5  3 websites
-  skills: 150, // S6  React Native / Flutter / Kotlin / Java / React + counters
+  apps: 255, //   S4  Apps
+  web: 185, //    S5  Websites
+  skills: 150, // S6  React Native / Flutter / Kotlin / Java / React (no counters)
   outro: 130, //  S7  Don't DM Now. (+ contact row)
 } as const;
 
@@ -58,9 +59,6 @@ export const SKILL_FIRST = 10;
 export const SKILL_STAGGER = 8;
 
 export const FILL_BG = `linear-gradient(180deg, ${C.teal500} 0%, ${C.teal500} 70%, ${C.teal300} 130%)`;
-
-// Facts used by the counters in the Skills scene.
-export const STATS = {apps: 7, websites: 3} as const;
 
 // Safe areas (px) for each format: keep important content inside these margins so the
 // Reels / Stories / Feed UI (profile name, caption, buttons) never covers it.

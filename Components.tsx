@@ -58,7 +58,7 @@ export const BlurText: React.FC<BlurTextProps> = ({
   text,
   fontFamily,
   fontSize,
-  color = C.teal900,
+  color = C.slate,
   fontWeight = 700,
   start = 0,
   stagger = 5,
@@ -144,7 +144,7 @@ export const Badge: React.FC<BadgeProps> = ({
         fontFamily,
         fontWeight: 700,
         fontSize: 30,
-        color: light ? C.teal900 : C.white,
+        color: light ? C.slate : C.white,
         background: light ? 'rgba(255,255,255,0.85)' : `linear-gradient(135deg, ${C.teal500}, ${C.teal700})`,
         border: `2px solid ${light ? C.teal300 : 'rgba(255,255,255,0.35)'}`,
         boxShadow: '0 18px 40px rgba(4,48,46,0.25)',
@@ -189,7 +189,7 @@ export const PhoneMock: React.FC<PhoneProps> = ({
   scrollDuration = 120,
   tilt = 0,
   statusBg = '#FFFFFF',
-  statusFg = C.teal900,
+  statusFg = C.slate,
   zoomTo = 1,
   focusY = 0.5,
   style,
@@ -217,7 +217,7 @@ export const PhoneMock: React.FC<PhoneProps> = ({
         width,
         height,
         borderRadius: 54,
-        background: `linear-gradient(160deg, #13605A 0%, ${C.teal900} 100%)`,
+        background: `linear-gradient(160deg, #5A3D2B 0%, ${C.slate} 100%)`,
         padding: bezel,
         boxSizing: 'border-box',
         boxShadow: '0 40px 80px rgba(4,48,46,0.35), 0 0 0 2px rgba(255,255,255,0.18) inset',
@@ -319,7 +319,7 @@ export const AppCard: React.FC<AppCardProps> = ({src, label, size = 300, delay =
       >
         <Img src={src} style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
       </div>
-      <div style={{fontFamily, fontWeight: 700, fontSize: 26, color: C.teal900, textAlign: 'center', lineHeight: 1.25, width: size + labelPad, margin: `0 ${-labelPad / 2}px`}}>
+      <div style={{fontFamily, fontWeight: 700, fontSize: 26, color: C.slate, textAlign: 'center', lineHeight: 1.25, width: size + labelPad, margin: `0 ${-labelPad / 2}px`}}>
         {label}
       </div>
     </div>
@@ -348,7 +348,7 @@ export const CTA: React.FC<{text: string; delay?: number; fontFamily?: string; s
         padding: '24px 46px',
         borderRadius: 999,
         background: C.gold,
-        color: C.teal900,
+        color: C.slate,
         fontFamily,
         fontWeight: 700,
         fontSize: 36,
@@ -364,7 +364,7 @@ export const CTA: React.FC<{text: string; delay?: number; fontFamily?: string; s
           width: 46,
           height: 46,
           borderRadius: '50%',
-          background: C.teal900,
+          background: C.slate,
           color: C.white,
           display: 'flex',
           alignItems: 'center',
@@ -417,7 +417,7 @@ export const Squiggle: React.FC<{width: number; color?: string; start?: number; 
 };
 
 // Smiley drawn in SVG, because the render machine may have no emoji font.
-export const Smile: React.FC<{size?: number; color?: string}> = ({size = 40, color = C.teal900}) => (
+export const Smile: React.FC<{size?: number; color?: string}> = ({size = 40, color = C.slate}) => (
   <svg width={size} height={size} viewBox="0 0 40 40" style={{verticalAlign: 'middle'}}>
     <circle cx="20" cy="20" r="17" fill="none" stroke={color} strokeWidth="3" />
     <circle cx="14" cy="16" r="2.4" fill={color} />
@@ -493,49 +493,7 @@ export const SkillCard: React.FC<{icon: GlyphName; label: string; size?: number;
       >
         <Glyph name={icon} size={size * 0.5} color={C.teal700} stroke={3.2} />
       </div>
-      <div style={{fontFamily: F.role, fontWeight: 800, fontSize: labelSize, color: C.teal900, textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.2}}>{label}</div>
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------------ */
-/* StatChip — pill with a counting number ("7  Apps")                  */
-/* ------------------------------------------------------------------ */
-export const StatChip: React.FC<{value: number; label: string; delay?: number; fontSize?: number; style?: React.CSSProperties}> = ({
-  value,
-  label,
-  delay = 0,
-  fontSize = 38,
-  style,
-}) => {
-  const frame = useCurrentFrame();
-  const {fps} = useVideoConfig();
-  const s = spring({frame: frame - delay, fps, config: {damping: 12, stiffness: 130}});
-  const n = Math.round(
-    interpolate(frame - delay - 4, [0, 26], [0, value], {
-      extrapolateLeft: 'clamp',
-      extrapolateRight: 'clamp',
-      easing: Easing.out(Easing.cubic),
-    })
-  );
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 16,
-        padding: `${fontSize * 0.42}px ${fontSize * 0.95}px`,
-        borderRadius: 999,
-        background: `linear-gradient(135deg, ${C.teal500}, ${C.teal700})`,
-        border: '2px solid rgba(255,255,255,0.35)',
-        boxShadow: '0 18px 40px rgba(4,48,46,0.25)',
-        opacity: Math.min(1, s * 1.5),
-        transform: `scale(${0.6 + 0.4 * s})`,
-        ...style,
-      }}
-    >
-      <span style={{fontFamily: F.hello, fontWeight: 800, fontSize: fontSize * 1.6, lineHeight: 1, color: C.white, minWidth: fontSize * 0.9, textAlign: 'center'}}>{n}</span>
-      <span style={{fontFamily: F.tagline, fontWeight: 800, fontSize, color: C.teal100, lineHeight: 1}}>{label}</span>
+      <div style={{fontFamily: F.role, fontWeight: 800, fontSize: labelSize, color: C.slate, textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.2}}>{label}</div>
     </div>
   );
 };
@@ -568,10 +526,10 @@ export const ContactRow: React.FC<{start: number; size?: number; direction?: 'ro
         const p = interpolate(frame - start - i * 8, [0, 18], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
         return (
           <div key={c.text + i} style={{display: 'flex', alignItems: 'center', gap: size * 0.4, opacity: p, transform: `translateY(${(1 - p) * 16}px)`}}>
-            <div style={{width: size * 1.6, height: size * 1.6, borderRadius: '50%', background: C.teal900, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <div style={{width: size * 1.6, height: size * 1.6, borderRadius: '50%', background: C.slate, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <Glyph name={c.icon} size={size * 0.95} color={C.white} stroke={3.4} />
             </div>
-            <div style={{fontFamily: F.tagline, fontWeight: 800, fontSize: size, color: C.teal900}}>{c.text}</div>
+            <div style={{fontFamily: F.tagline, fontWeight: 800, fontSize: size, color: C.slate}}>{c.text}</div>
           </div>
         );
       })}

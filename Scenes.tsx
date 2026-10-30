@@ -1,8 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START, STATS} from './theme';
+import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START} from './theme';
 import {F} from './fonts';
-import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle, StatChip} from './Components';
+import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle} from './Components';
 import {SKILLS} from './Icons';
 
 import me from './mypicture.jpg';
@@ -44,7 +44,7 @@ export const SceneHook: React.FC = () => {
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 34}}>
       <div style={{fontFamily: F.lookingFor, fontWeight: 500, fontSize: 64, color: C.teal900, opacity: fadeIn(frame, 4), transform: `translateY(${(1 - fadeIn(frame, 4)) * 20}px)`}}>
-        Looking for
+        Introducing
       </div>
       <BlurText
         text="Introvert App & Developer"
@@ -103,7 +103,7 @@ export const SceneIntro: React.FC = () => {
       </div>
 
       {/* pop-ups float up around the photo */}
-      <Badge icon="app" text="Android Apps" delay={FOCUS + 22} style={{left: 590, top: 205}} />
+      <Badge icon="app" text="Android & iOS Apps" delay={FOCUS + 22} style={{left: 520, top: 205}} />
       <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{left: 80, top: 815}} />
       <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 640, top: 790}} />
 
@@ -113,12 +113,12 @@ export const SceneIntro: React.FC = () => {
           <span style={{width: 12, height: 12, borderRadius: 6, background: C.teal700}} />
           Introvert by choice
         </div>
-        <BlurText text="Hello, I'm" fontFamily={F.hello} fontSize={92} fontWeight={800} color={C.teal900} start={26} stagger={8} style={{justifyContent: 'flex-start', marginTop: 24}} />
+        <BlurText text="Hello, I'm" fontFamily={F.hello} fontSize={92} fontWeight={800} color={C.slate} start={26} stagger={8} style={{justifyContent: 'flex-start', marginTop: 24}} />
         <BlurText text="Rizwan" fontFamily={F.name} fontSize={165} fontWeight={900} color={C.teal500} start={44} stagger={8} style={{justifyContent: 'flex-start', marginTop: -8}} />
-        <BlurText text="Chowdhury" fontFamily={F.name} fontSize={100} fontWeight={700} color={C.teal900} start={58} stagger={8} style={{justifyContent: 'flex-start', marginTop: -6}} />
+        <BlurText text="Chowdhury" fontFamily={F.name} fontSize={100} fontWeight={700} color={C.slate} start={58} stagger={8} style={{justifyContent: 'flex-start', marginTop: -6}} />
         <Squiggle width={520} start={80} duration={25} style={{marginTop: 4}} />
         <BlurText text="App & Website Developer" fontFamily={F.role} fontSize={56} fontWeight={800} color={C.teal700} start={FOCUS + 30} stagger={6} style={{justifyContent: 'flex-start', marginTop: 14}} />
-        <div style={{fontFamily: F.bn, fontWeight: 700, fontSize: 38, color: C.teal900, marginTop: 8, opacity: fadeIn(frame, FOCUS + 55)}}>
+        <div style={{fontFamily: F.bn, fontWeight: 700, fontSize: 38, color: C.slate, marginTop: 8, opacity: fadeIn(frame, FOCUS + 55)}}>
           অ্যাপ ও ওয়েবসাইট ডেভেলপার
         </div>
         <CTA text="See My Work" delay={FOCUS + 75} style={{marginTop: 28}} />
@@ -164,7 +164,7 @@ export const SceneApps: React.FC = () => {
 export const SceneWeb: React.FC = () => {
   const cols: {src: string; ratio: number; name: string; font: string; w: number; h: number; delay: number; tilt: number; sb: string; fg: string; zoom?: number}[] = [
     {src: webS2, ratio: 1367 / 720, name: 'ইসলামী বিশ্বকোষ ও আল হাদিস S2', font: F.bn, w: 360, h: 650, delay: 8, tilt: -3, sb: '#02736f', fg: '#FFFFFF'},
-    {src: webAI, ratio: 1371 / 720, name: 'IslamiPedia AI', font: F.hello, w: 420, h: 740, delay: 0, tilt: 0, sb: '#f7f7f7', fg: C.teal900, zoom: 1.3},
+    {src: webAI, ratio: 1371 / 720, name: 'IslamiPedia AI', font: F.hello, w: 420, h: 740, delay: 0, tilt: 0, sb: '#f7f7f7', fg: C.slate, zoom: 1.3},
     {src: webTask, ratio: 1373 / 720, name: 'RizwanTask', font: F.role, w: 360, h: 650, delay: 16, tilt: 3, sb: '#02110e', fg: '#CFEEE8'},
   ];
   return (
@@ -178,7 +178,7 @@ export const SceneWeb: React.FC = () => {
         {cols.map((c) => (
           <div key={c.name} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16}}>
             <PhoneMock src={c.src} imgRatio={c.ratio} width={c.w} height={c.h} delay={c.delay} scrollStart={34 + c.delay} scrollDuration={125} tilt={c.tilt} statusBg={c.sb} statusFg={c.fg} zoomTo={c.zoom} focusY={0.5} />
-            <div style={{fontFamily: c.font, fontWeight: 700, fontSize: 32, color: C.teal900}}>{c.name}</div>
+            <div style={{fontFamily: c.font, fontWeight: 700, fontSize: 32, color: C.slate}}>{c.name}</div>
           </div>
         ))}
       </div>
@@ -200,10 +200,6 @@ export const SceneSkills: React.FC = () => (
           <SkillCard key={k.label} icon={k.icon} label={k.label} size={270} labelSize={36} delay={SKILL_FIRST + i * SKILL_STAGGER} />
         ))}
       </div>
-      <div style={{display: 'flex', gap: 40}}>
-        <StatChip value={STATS.apps} label="Apps" delay={62} fontSize={42} />
-        <StatChip value={STATS.websites} label="Websites" delay={74} fontSize={42} />
-      </div>
     </div>
   </AbsoluteFill>
 );
@@ -216,23 +212,23 @@ export const SceneOutro: React.FC = () => {
   const rise = (start: number) => ({opacity: fadeIn(frame, start), transform: `translateY(${(1 - fadeIn(frame, start)) * 24}px)`});
   return (
     <AbsoluteFill style={{background: FILL_BG, justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
-      <div style={{...rise(2), fontFamily: F.dm, fontSize: 150, lineHeight: 1, letterSpacing: 12, color: C.teal900}}>
+      <div style={{...rise(2), fontFamily: F.dm, fontSize: 150, lineHeight: 1, letterSpacing: 12, color: C.slate}}>
         Please
       </div>
       <div style={{fontFamily: F.dm, fontSize: 330, marginTop: -6, lineHeight: 1, color: C.white, letterSpacing: 4, textShadow: '0 14px 50px rgba(4,48,46,0.4)', opacity: Math.min(1, stamp * 2), transform: `scale(${1.7 - 0.7 * stamp}) rotate(${-4 * (1 - stamp)}deg)`}}>
         Don’t DM Now.
       </div>
-      <div style={{...rise(40), fontFamily: F.tagline, fontWeight: 600, fontSize: 44, color: C.teal900, marginTop: 6, display: 'flex', alignItems: 'center', gap: 12}}>
-        (I’ll reply when I’m ready
+      <div style={{...rise(40), fontFamily: F.tagline, fontWeight: 600, fontSize: 44, color: C.slate, marginTop: 6, display: 'flex', alignItems: 'center', gap: 12}}>
+        (I’ll reply when I’m in the mood
         <Smile size={44} />)
       </div>
-      <div style={{...rise(62), fontFamily: F.fullName, fontWeight: 700, fontSize: 96, color: C.teal900, marginTop: 56}}>
+      <div style={{...rise(62), fontFamily: F.fullName, fontWeight: 700, fontSize: 96, color: C.slate, marginTop: 56}}>
         Rizwan Chowdhury
       </div>
-      <div style={{...rise(78), fontFamily: F.tagline, fontWeight: 800, fontSize: 32, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.teal900, marginTop: 8}}>
+      <div style={{...rise(78), fontFamily: F.tagline, fontWeight: 800, fontSize: 32, letterSpacing: '0.22em', textTransform: 'uppercase', color: C.slate, marginTop: 8}}>
         App &amp; Website Developer
       </div>
-      <Squiggle width={300} color={C.teal900} start={92} style={{marginTop: 14}} />
+      <Squiggle width={300} color={C.slate} start={92} style={{marginTop: 14}} />
       <ContactRow start={98} size={32} direction="row" style={{marginTop: 26}} />
     </AbsoluteFill>
   );

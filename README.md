@@ -22,4 +22,11 @@ Open `theme.ts` -> `CONTACT` and un-comment / edit the lines. They appear automa
 - All icons are SVG vectors (`Icons.tsx`): no emoji, no icon fonts.
 - `theme.ts` holds scene timing; `DURATION` is computed. `SfxTrack.tsx` places sounds relative to each scene, so moving a scene keeps the sounds in sync.
 
+## Current copy (all 3 formats)
+- Hook: **Introducing** / Introvert App & Developer
+- Badges: **Android & iOS Apps**, Websites, IslamiPedia AI
+- Skills scene: 5 skill cards only (no "7 Apps / 3 Websites" counters)
+- Outro: Please don't DM Now. (I'll reply when I'm in the mood)
+- Colors: `C.teal900` only on the hook word "Introducing"; all other dark text/icons use `C.slate` (`theme.ts`)
+
 Master plan: see `RizwanVideo.md`.

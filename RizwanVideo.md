@@ -11,7 +11,7 @@
 | বিষয় | মান |
 |---|---|
 | মালিক | **Rizwan Chowdhury** — App & Website Developer |
-| থিম/হুক | **"Looking for introvert App & Developer"** → শেষে **"Please don't DM Now."** |
+| থিম/হুক | **"Introducing introvert App & Developer"** → শেষে **"Please don't DM Now."** |
 | দৈর্ঘ্য | **30 সেকেন্ড** = 900 ফ্রেম @ 30 fps |
 | অনুপাত | **16:9** (মূল) এবং **9:16** (ভার্টিক্যাল/রিলস, শুধু HD) |
 | আউটপুট | **16:9:** HD 1920×1080 এবং 4K 3840×2160 (দুটোই) • **9:16:** শুধু **HD 1080×1920** (4K নেই) |
@@ -27,7 +27,7 @@
 ### Reference ভিডিও বিশ্লেষণ (18.6s, 6 দৃশ্য)
 | # | Reference-এ কী আছে | আপনার ভিডিওতে রূপান্তর |
 |---|---|---|
-| 1 | হলুদ BG, "Looking for / **Content Creator**" blur→sharp | Teal BG, "Looking for / **Introvert App & Developer**" |
+| 1 | হলুদ BG, "Looking for / **Content Creator**" blur→sharp | Teal BG, "Introducing / **Introvert App & Developer**" (রেফারেন্সের "Looking for" বদলে **Introducing**) |
 | 2 | গোল ছবি + "Hello, I'm **Akash**" + ছোট পিল ব্যাজ | কার্টুন পোর্ট্রেট গোল ফ্রেমে + "Hello, I'm **Rizwan**" |
 | 3 | ছবি বড় হয়, ফ্লোটিং ব্যাজ ("AI Powered"), রোল লাইন, কালো CTA বাটন | "App & Website Developer", ফ্লোটিং ব্যাজ, "See My Work →" |
 | 4 | "Video Projects / Reel Edits" — ফোন-কার্ড মকআপ স্লাইড | **Apps** — ৭টি অ্যাপ কার্ড |
@@ -40,20 +40,23 @@
 
 ### রঙ (Teal)
 ```
---teal-900: #04302E   (গাঢ় টেক্সট)
+--teal-900: #4A2C17   (ওয়ার্ম এসপ্রেসো ব্রাউন; শুধু "Introducing")
 --teal-700: #0B6E6A
 --teal-500: #0FA3A0   (প্রধান ব্র্যান্ড)
 --teal-300: #5EEAD4   (হাইলাইট/ব্যাজ)
 --teal-100: #D7F5F1   (হালকা BG)
 --ink:      #0A1F1E   (CTA বাটন)
+--slate:    #2B1B12   (ডিপ চারকোল-এসপ্রেসো, গ্রেডেড ডার্ক টেক্সট — Hook-এর "Introducing" ছাড়া বাকি সব ডার্ক লেখা/আইকন)
 --paper:    #F4FFFD   (সাদাটে BG)
 ```
+> **কালার গ্রেডিং নিয়ম:** `--teal-900 (#4A2C17; আগে #04302E → #073B4C)` শুধু Hook-এর **"Introducing"** শব্দে থাকে। একই রঙ আর কোথাও নেই — নাম, "Hello, I'm", "Please", ক্যাপশন, লেবেল, আইকন, ফোন-মকআপ, CTA বাটন সব এখন গ্রেডেড **`--slate #2B1B12`** (`theme.ts` → `C.slate`)।
+
 দৃশ্য ১ ও ৬: পূর্ণ Teal-500 গ্রেডিয়েন্ট BG (Reference-এর হলুদ দৃশ্যের মতো)। দৃশ্য ২–৫: `--paper` BG + হালকা গ্রিড।
 
 ### ফন্ট বরাদ্দ (প্রতিটি ইংরেজি টেক্সট = আলাদা ফন্ট)
 | টেক্সট | ফন্ট (`@remotion/google-fonts/...`) |
 |---|---|
-| "Looking for" | `SpaceGrotesk` |
+| "Introducing" (আগে "Looking for") | `SpaceGrotesk` |
 | "Introvert App & Developer" | `Unbounded` |
 | "Hello, I'm" | `Syne` |
 | "Rizwan" (নাম হাইলাইট) | `Fraunces` (italic) |
@@ -75,12 +78,12 @@
 
 | দৃশ্য | সময় | ফ্রেম | বিষয়বস্তু |
 |---|---|---|---|
-| S1 Hook | 0.0–3.5s | 0–105 | Teal BG • "Looking for" → "Introvert App & Developer" (শব্দ ধরে blur-in) |
-| S2+S3 Intro (এক টানা দৃশ্য) | 3.6–12.2s | 108–366 | Reference-এর মতো **একই ফ্রেমে**: ছবি স্লাইড-ইন • "Hello, I'm **Rizwan**" + পিল "Introvert by choice" → নাম দেখানোর পর **ছবিতে ফোকাস (জুম)** → ছবির চারপাশে পপ-আপ ব্যাজ ভেসে ওঠে (Android Apps, Websites, IslamiPedia AI) → নিচে "App & Website Developer" + "See My Work →" |
+| S1 Hook | 0.0–3.5s | 0–105 | Teal BG • "Introducing" → "Introvert App & Developer" (শব্দ ধরে blur-in) |
+| S2+S3 Intro (এক টানা দৃশ্য) | 3.6–12.2s | 108–366 | Reference-এর মতো **একই ফ্রেমে**: ছবি স্লাইড-ইন • "Hello, I'm **Rizwan**" + পিল "Introvert by choice" → নাম দেখানোর পর **ছবিতে ফোকাস (জুম)** → ছবির চারপাশে পপ-আপ ব্যাজ ভেসে ওঠে (Android & iOS Apps, Websites, IslamiPedia AI) → নিচে "App & Website Developer" + "See My Work →" |
 | ~~S3 Role~~ | — | — | **S2-র সঙ্গে মিশিয়ে ফেলা হয়েছে** (আলাদা দৃশ্য ও আলাদা ট্রানজিশন নেই) |
 | S4 Apps | 11.5–19.0s | 345–570 | "Apps" টাইটেল • ৭ অ্যাপ কার্ড দুই সারিতে স্লাইড/স্ট্যাগার |
 | S5 Websites | 19.0–24.5s | 570–735 | "Websites" টাইটেল • ৩টি ফোন মকআপ (ছবি স্ক্রল করে) |
-| S6 Outro | 25.7–30.0s | 770–900 | Teal wipe • **"Please" (ছোট) + "Don't DM Now." (বড় স্ট্যাম্প)** • "(I'll reply when I'm ready 🙂)" • নাম • রোল লাইন • সিগনেচার আন্ডারলাইন |
+| S6 Outro | 25.7–30.0s | 770–900 | Teal wipe • **"Please" (ছোট) + "Don't DM Now." (বড় স্ট্যাম্প)** • "(I'll reply when I'm in the mood 🙂)" • নাম • রোল লাইন • সিগনেচার আন্ডারলাইন |
 
 ট্রানজিশন: প্রতি দৃশ্যের মাঝে ১০–১২ ফ্রেম ক্রসফেড/স্লাইড (`@remotion/transitions`)।
 অডিও: ০–১s fade-in, শেষ ১.৫s fade-out; ভলিউম ০.৮।
@@ -146,12 +149,12 @@ RizwanVideo.md          README.md
 - [x] **C7.** `AudioTrack.tsx` (আলাদা ফাইল, যাতে mp3 আপলোডের আগে বাকি কোড না ভাঙে) — `<Audio src={bgm}>` (`import bgm from './background.mp3'`) + `interpolate` ফেড ইন/আউট।
 
 ### ধাপ D — দৃশ্য নির্মাণ (প্রতিটি আলাদা ধাপ; ছোট ছোট কমিটে)
-- [x] **D1. S1 Hook** — Teal গ্রেডিয়েন্ট; "Looking for" (SpaceGrotesk) ছোট, নিচে "Introvert App & Developer" (Unbounded) BlurText।
+- [x] **D1. S1 Hook** — Teal গ্রেডিয়েন্ট; "Introducing" (SpaceGrotesk) ছোট, নিচে "Introvert App & Developer" (Unbounded) BlurText।
 - [x] **D2. S2 Intro** — (এখন D3-র সঙ্গে এক দৃশ্য) আগের বিবরণ: গোল ফ্রেমে `mypicture.jpg` (Teal-300 বৃত্তের ওপর), বাম থেকে স্লাইড; "Hello, I'm" + *Rizwan* ডানে; পিল "Introvert by choice"। **বাস্তবায়ন:** গোলকোণ কার্ড।
-- [x] **D3. S3 Role** — (এখন S2-র ভেতরেই) নাম দেখানোর পর ছবি জুম-ইন (ফোকাস) + গ্লো; ব্যাজ "+ Android Apps", "+ Websites", "+ IslamiPedia AI" ছবির চারপাশে ভেসে ওঠে; নামের নিচে রোল লাইন "App & Website Developer" + বাংলা লাইন; CTA "See My Work →"। কোড: `SceneIntro` (`Scenes.tsx`), `FOCUS = 105` ফ্রেমে ফোকাস শুরু।
+- [x] **D3. S3 Role** — (এখন S2-র ভেতরেই) নাম দেখানোর পর ছবি জুম-ইন (ফোকাস) + গ্লো; ব্যাজ "Android & iOS Apps", "Websites", "IslamiPedia AI" ছবির চারপাশে ভেসে ওঠে; নামের নিচে রোল লাইন "App & Website Developer" + বাংলা লাইন; CTA "See My Work →"। কোড: `SceneIntro` (`Scenes.tsx`), `FOCUS = 105` ফ্রেমে ফোকাস শুরু।
 - [x] **D4. S4 Apps** — "Apps" টাইটেল (Playfair) + আন্ডারলাইন; ৭ কার্ড (৪+৩) স্ট্যাগার-ইন, হালকা ববিং।
 - [x] **D5. S5 Websites** — "Websites" টাইটেল (Sora); ৩ ফোন মকআপ, মাঝেরটি বড়; ভেতরে ধীর স্ক্রল; নিচে সাইটের নাম।
-- [x] **D6. S6 Outro** — Teal wipe; **"Please" (Bebas, ছোট, উপরে) + "Don't DM Now." (Bebas, বড় স্ট্যাম্প)** = পুরো লেখা "Please don't DM Now."; তার নিচে ছোট "(I'll reply when I'm ready" + `<Smile/>` + ")" (ফন্ট: `tagline`); নিচে "Rizwan Chowdhury" (Cormorant) + "App & Website Developer" (Manrope); ছোট আন্ডারলাইন স্ট্রোক।
+- [x] **D6. S6 Outro** — Teal wipe; **"Please" (Bebas, ছোট, উপরে) + "Don't DM Now." (Bebas, বড় স্ট্যাম্প)** = পুরো লেখা "Please don't DM Now."; তার নিচে ছোট "(I'll reply when I'm in the mood" + `<Smile/>` + ")" (ফন্ট: `tagline`); নিচে "Rizwan Chowdhury" (Cormorant) + "App & Website Developer" (Manrope); ছোট আন্ডারলাইন স্ট্রোক।
 - [x] **D7.** `Video.tsx` — `TransitionSeries` দিয়ে **৫ দৃশ্য** জোড়া (S2+S3 মিলিয়ে; হিসাব: ১২০+২৫৮+২৫৫+১৮৫+১৩০ − ৪×১২ = **৯০০ ফ্রেম**); `theme.ts` ভুল হলে নিজেই error দেয়।
 
 ### ধাপ E — লোকাল-ছাড়া ভিজ্যুয়াল চেক (মোবাইল-ফ্রেন্ডলি)
@@ -181,11 +184,11 @@ RizwanVideo.md          README.md
 
 - [x] **H1.** `theme.ts`-এ `V_WIDTH=1080`, `V_HEIGHT=1920`; `Root.tsx`-এ দ্বিতীয় Composition `IntroVertical` (প্রথমটি `Intro` অপরিবর্তিত)।
 - [x] **H2. `ScenesVertical.tsx`** (৫ দৃশ্য, ১৬:৯-এর সঙ্গে হুবহু একই কনটেন্ট):
-  - **Hook:** "Looking for" + "Introvert App & Developer" (৪টি শব্দ ৩ লাইনে ভাঙে, blur-in)।
-  - **Intro (এক টানা):** ছবি **উপর থেকে** নামে (মাঝখানে, 620px) → "Hello, I'm Rizwan" নিচে মাঝবরাবর → ছবিতে ফোকাস (জুম + গ্লো) → ৩টি পপ-আপ (Android Apps, Websites, IslamiPedia AI) ভেসে ওঠে → "App & Website Developer" + বাংলা লাইন + "See My Work →"।
+  - **Hook:** "Introducing" + "Introvert App & Developer" (৪টি শব্দ ৩ লাইনে ভাঙে, blur-in)।
+  - **Intro (এক টানা):** ছবি **উপর থেকে** নামে (মাঝখানে, 620px) → "Hello, I'm Rizwan" নিচে মাঝবরাবর → ছবিতে ফোকাস (জুম + গ্লো) → ৩টি পপ-আপ (Android & iOS Apps, Websites, IslamiPedia AI) ভেসে ওঠে → "App & Website Developer" + বাংলা লাইন + "See My Work →"।
   - **Apps:** ৭ কার্ড **৩+৩+১** গ্রিডে (১৬:৯-এ ছিল ৪+৩), একই স্ট্যাগার সময়।
   - **Websites:** মাঝে বড় ফোন (IslamiPedia AI), দুই পাশে ছোট দুই ফোন (একটু ওভারল্যাপ, মাঝেরটি উপরে)।
-  - **Outro:** "Please" (ছোট) → **"Don't DM" / "Now."** দুই লাইনের বড় স্ট্যাম্প (১০৮০ চওড়ায় এক লাইনে ধরে না) → "(I'll reply when I'm ready 🙂)" → নাম → রোল → আন্ডারলাইন।
+  - **Outro:** "Please" (ছোট) → **"Don't DM" / "Now."** দুই লাইনের বড় স্ট্যাম্প (১০৮০ চওড়ায় এক লাইনে ধরে না) → "(I'll reply when I'm in the mood 🙂)" → নাম → রোল → আন্ডারলাইন।
 - [x] **H3. `VideoVertical.tsx`** — ১৬:৯-এর মতোই `TransitionSeries` (১২০+২৫৮+২৫৫+১৮৫+১৩০ − ৪×১২ = ৯০০); ট্রানজিশন একই (fade, fade, slide-from-bottom, wipe)।
 - [x] **H4. `render.yml`** — নতুন `mode`: `vertical-stills` (৮টি ফ্রেম PNG, নাম `still-IntroVertical-NNN.png`) ও `vertical` (আউটপুট **`Rizwan-Vertical-HD.mp4`**, 1080×1920, crf 16)। preflight এখন `ScenesVertical.tsx`/`VideoVertical.tsx`-ও যাচাই করে। `package.json`-এ `render:vertical` স্ক্রিপ্ট।
 - [ ] **H5. (আপনি)** Actions → Run workflow → `vertical-stills` → ছবি দেখুন → ঠিক থাকলে `vertical`।
@@ -210,8 +213,8 @@ RizwanVideo.md          README.md
 ## ৬. খোলা সিদ্ধান্ত (ডিফল্ট ধরে এগোব; বদলাতে চাইলে জানান)
 
 1. **S2-এর ছোট পিল:** "Introvert by choice" ✔ ডিফল্ট — অন্য লেখা চাইলে বলুন।
-2. **S3 ব্যাজ:** "Android Apps" ও "Websites" ✔ ডিফল্ট (আপনার সঠিক টেক-স্ট্যাক জানালে ব্যাজ নিখুঁত হবে — যেমন React Native/Flutter/React)।
-3. **S6 ট্যাগলাইন:** ✔ **চূড়ান্ত:** "Please don't DM Now." (দুই লাইন: Please ছোট, Don't DM Now. বড়) + নিচে ছোট করে "(I'll reply when I'm ready 🙂)" — 🙂 টেক্সট ইমোজি নয়, `Smile` SVG কম্পোনেন্ট (রানারে ইমোজি ফন্ট নাও থাকতে পারে)।
+2. **S3 ব্যাজ:** "Android & iOS Apps" ও "Websites" ✔ (আপনি শুধু Android নন — Android ও iOS দুটোই) (আপনার সঠিক টেক-স্ট্যাক জানালে ব্যাজ নিখুঁত হবে — যেমন React Native/Flutter/React)।
+3. **S6 ট্যাগলাইন:** ✔ **চূড়ান্ত:** "Please don't DM Now." (দুই লাইন: Please ছোট, Don't DM Now. বড়) + নিচে ছোট করে "(I'll reply when I'm in the mood 🙂)" — 🙂 টেক্সট ইমোজি নয়, `Smile` SVG কম্পোনেন্ট (রানারে ইমোজি ফন্ট নাও থাকতে পারে)।
 4. **যোগাযোগ লিংক:** ভিডিওতে কোনো ইমেইল/লিংক দেখাব না (আপনার "Don't DM" থিম অনুযায়ী) — চাইলে দৃশ্য ৬-এ ওয়েবসাইট লিংক যোগ হবে।
 5. **ইসলামী অ্যাপের বাংলা নাম:** কার্ডে ক্যাপশন হিসেবে ছবির লেখার মতোই ব্যবহার হবে।
 
@@ -231,6 +234,9 @@ RizwanVideo.md ফেরত দাও এবং পরের ধাপের এ
 ## ৮. অগ্রগতি লগ
 | তারিখ | ধাপ | নোট |
 |---|---|---|
+| 2026-10-30 | ডার্ক কালার ক্যাটাগরি বদল | নেভি/টিল-ডার্ক ক্যাটাগরি বাদ → ওয়ার্ম এসপ্রেসো: `C.teal900` = **`#4A2C17`** (Introducing), `C.slate` = **`#2B1B12`** (বাকি সব ডার্ক টেক্সট/আইকন)। গোল্ড CTA ও Teal BG-র সঙ্গে কমপ্লিমেন্টারি। ফোন-ফ্রেমের গ্রেডিয়েন্ট (`Components.tsx`) টিল→ব্রাউনে মুড়ে না যায় তাই `#13605A` → `#5A3D2B`। বদলেছে: `theme.ts`, `Components.tsx`, `RizwanVideo.md`। |
+| 2026-10-30 | teal900 রঙ বদল | `#04302E` → **`#073B4C`** (ডিপ নেভি-টিল, Teal ব্যাকগ্রাউন্ডে কনট্রাস্ট ~৪:১)। শুধু `theme.ts` (`C.teal900`) ও `RizwanVideo.md` বদলেছে; অন্য ফাইলে হাত পড়েনি। |
+| 2026-10-30 | টেক্সট/কালার/স্কিলস সংশোধন | **(১) Skills দৃশ্য:** "7 Apps" ও "3 Websites" কাউন্টার পিল সম্পূর্ণ বাদ (`StatChip` কম্পোনেন্ট, `STATS` (`theme.ts`) ও তার দুই SFX মুছে ফেলা) — ১৬:৯, ৯:১৬, ৪:৫ তিন ভার্সনেই; স্কিল কার্ড এখন একাই মাঝখানে। **(২) Android & iOS:** ব্যাজ "Android Apps" → **"Android & iOS Apps"** (লম্বা হওয়ায় তিন ভার্সনেই অবস্থান বাঁয়ে সরানো হয়েছে যাতে লেখার সঙ্গে ওভারল্যাপ না করে)। **(৩) Hook:** "Looking for" → **"Introducing"** (তিন ভার্সন)। **(৪) কালার গ্রেডিং:** "Introducing"-এর রঙ `#04302E` শুধু ওখানেই; বাকি সব জায়গার একই রঙ → নতুন `C.slate #0B2F3A` (`Scenes*.tsx`, `Components.tsx`, `Cover.tsx`)। **(৫) আউট্রো লাইন:** "(I'll reply when I'm ready 🙂)" → **"(I'll reply when I'm in the mood 🙂)"** (তিন ভার্সন)। বদলেছে: `theme.ts`, `Components.tsx`, `Scenes.tsx`, `ScenesVertical.tsx`, `ScenesFeed.tsx`, `Cover.tsx`, `SfxTrack.tsx`, `README.md`, `RizwanVideo.md`। TypeScript চেক পাস; **ছবি রেন্ডার করে চোখে দেখা বাকি** (Actions → `stills`)। |
 | 2026-10-30 | প্ল্যান তৈরি | RizwanVideo.md প্রথম সংস্করণ |
 | 2026-10-30 | কালার গ্রেড + ভেক্টর অ্যারো + কন্টিনিউইটি + পুরো নাম | **(১) ColorGrade:** `Components.tsx`-এ `ColorGrade` (teal soft-light টিন্ট + হালকা ভিনিয়েট) + `Video`/`VideoVertical`-এ `saturate(1.06) contrast(1.03)` — সব দৃশ্য একই গ্রেডে, দুই ভার্সনেই। **(২) অ্যারো:** CTA-র `→` ফন্ট-গ্লিফ বাদ, এখন SVG ভেক্টর (গোল প্রান্ত, ২.৮ স্ট্রোক) — HD/4K-তে সমান ধারালো। **(৩) ফ্রেম-ধারাবাহিকতা:** `GridBG` এখন দৃশ্যের শুরুর *অ্যাবসোলিউট ফ্রেম* (`theme.ts` `START`) ধরে চলে, তাই দৃশ্য বদলের সময় গ্রিড লাফায় না; Apps ও Websites-এর শিরোনাম একই জায়গা/সাইজে (১৬:৯ ও ৯:১৬ দুটোতেই)। **(৪) পুরো নাম:** ইন্ট্রোতে "Rizwan" (বড়) + নিচে "Chowdhury" (italic) = Rizwan Chowdhury; আউট্রোতে আগে থেকেই পুরো নাম আছে। ১৬:৯ ইন্ট্রোর লেখার ব্লক উপরে (top 150) ও ফন্ট একটু ছোট করা হয়েছে যাতে নিচে না কাটে। |
 | 2026-10-30 | ধাপ H ✔ (৯:১৬ HD) | নতুন: `ScenesVertical.tsx`, `VideoVertical.tsx`। বদলেছে: `Root.tsx` (+`IntroVertical`), `theme.ts` (+`V_WIDTH/V_HEIGHT`), `package.json` (+`render:vertical`), `render.yml` (+`vertical-stills`, `vertical`, preflight)। বাকি সব অপরিবর্তিত। **লেআউট চোখে দেখা বাকি** (H5)। |

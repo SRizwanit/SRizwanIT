@@ -56,8 +56,8 @@ export const Cover: React.FC = () => {
         </div>
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <div style={{fontFamily: F.name, fontWeight: 900, fontSize: nameSize, lineHeight: 1.05, color: C.white, textShadow: '0 10px 40px rgba(4,48,46,0.35)'}}>Rizwan</div>
-          <div style={{fontFamily: F.name, fontWeight: 700, fontSize: lastSize, lineHeight: 1.05, color: C.teal900}}>Chowdhury</div>
-          <div style={{fontFamily: F.role, fontWeight: 800, fontSize: roleSize, color: C.teal900, marginTop: 18 * u}}>App &amp; Website Developer</div>
+          <div style={{fontFamily: F.name, fontWeight: 700, fontSize: lastSize, lineHeight: 1.05, color: C.slate}}>Chowdhury</div>
+          <div style={{fontFamily: F.role, fontWeight: 800, fontSize: roleSize, color: C.slate, marginTop: 18 * u}}>App &amp; Website Developer</div>
           <div style={{display: 'flex', gap: 22 * u, marginTop: 34 * u}}>
             {SKILLS.map((k) => (
               <div key={k.label} style={{width: chip, height: chip, borderRadius: chip * 0.3, background: C.white, boxShadow: '0 14px 30px rgba(4,48,46,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
