@@ -12,10 +12,8 @@ export const F_HEIGHT = 1350;
 export const FPS = 30;
 
 export const C = {
-  teal900: '#8E0E3A', // used ONLY by the hook word "Introducing": deep raspberry (was indigo #2A1B8F)
-  indigoLight: '#FF6A5C', // coral for glows / gradient end of "Introducing" (was #6D5BFF)
-  slate: '#2A0A1E', //   deep plum: ALL other dark text/icons (was navy #0E2447)
-  slateSoft: '#6B2147', // softer plum (phone bezel highlight) (was #27407A)
+  teal900: '#0B1F4B', // used ONLY by the hook word "Introducing": deep midnight navy (was espresso brown #4A2C17)
+  slate: '#10243A', //   deep navy-charcoal: ALL other dark text/icons (cool tone, pairs with teal + gold; was espresso #2B1B12)
   teal700: '#0B6E6A',
   teal500: '#0FA3A0',
   teal300: '#5EEAD4',

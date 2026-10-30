@@ -1,121 +1,49 @@
-import React, {createContext, useContext} from 'react';
-import {AbsoluteFill, Easing, Img, interpolate, random, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import React from 'react';
+import {AbsoluteFill, Easing, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 import {C, CONTACT} from './theme';
 import {F} from './fonts';
-import {Glyph, GlyphName} from './Icons';
-
-/* ------------------------------------------------------------------ */
-/* CamCtx / Camera — slow cinematic push-in for a whole scene.         */
-/* The foreground scales by `push`; GridBG (background layer) reads    */
-/* the same value and scales LESS => simple parallax depth.            */
-/* ------------------------------------------------------------------ */
-const CamCtx = createContext(0); // current push amount (0 = none, 0.035 = +3.5%)
-export const Camera: React.FC<{duration: number; push?: number; drift?: number; children: React.ReactNode}> = ({duration, push = 0.035, drift = 0, children}) => {
-  const frame = useCurrentFrame();
-  const p = interpolate(frame, [0, duration], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.quad)});
-  const cam = push * p;
-  return (
-    <CamCtx.Provider value={cam}>
-      <AbsoluteFill style={{transform: `translateX(${-drift * p}px) scale(${1 + cam})`, transformOrigin: '50% 50%'}}>{children}</AbsoluteFill>
-    </CamCtx.Provider>
-  );
-};
-
-/* ------------------------------------------------------------------ */
-/* Particles — soft floating dots (3 depth layers, deterministic).     */
-/* Uses the ABSOLUTE frame (offset) so the dots never jump at a cut.   */
-/* tone 'dark' = for light paper scenes, 'light' = for teal scenes.    */
-/* ------------------------------------------------------------------ */
-export const Particles: React.FC<{offset?: number; count?: number; tone?: 'dark' | 'light'; seed?: string}> = ({offset = 0, count = 22, tone = 'dark', seed = 'p'}) => {
-  const frame = useCurrentFrame() + offset;
-  const palette = tone === 'light' ? ['#FFFFFF', C.teal100, C.teal300, C.gold] : [C.teal300, C.teal500, C.indigoLight, C.gold];
-  return (
-    <div style={{position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none'}}>
-      {Array.from({length: count}, (_, i) => {
-        const depth = 0.4 + random(`${seed}-d-${i}`) * 0.9; // 0.4 (far) .. 1.3 (near)
-        const size = 8 + depth * 18;
-        const x0 = random(`${seed}-x-${i}`) * 100;
-        const y0 = random(`${seed}-y-${i}`) * 120;
-        const rise = 0.016 * depth; // % of the height per frame (slow)
-        const y = (((y0 - frame * rise) % 120) + 120) % 120 - 10; // wraps -10..110
-        const x = x0 + Math.sin((frame + i * 23) / (60 + i * 3)) * 2.2 * depth;
-        const tw = 0.55 + 0.45 * Math.sin((frame + i * 17) / 24);
-        const col = palette[i % palette.length];
-        return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              left: `${x}%`,
-              top: `${y}%`,
-              width: size,
-              height: size,
-              borderRadius: '50%',
-              background: `radial-gradient(closest-side, ${col}, transparent)`,
-              opacity: (tone === 'light' ? 0.55 : 0.42) * tw * Math.min(1, depth),
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
+import {Glyph, GlyphName, SKILLS} from './Icons';
 
 /* ------------------------------------------------------------------ */
 /* C1  GridBG — soft paper background, faint teal grid, drifting glow  */
 /* ------------------------------------------------------------------ */
 // `offset` = absolute start frame of the scene. Using the ABSOLUTE frame keeps the grid in
 // exactly the same place when one scene cross-fades into the next (no jump at the cut).
-export const GridBG: React.FC<{dark?: boolean; offset?: number; particles?: boolean}> = ({dark, offset = 0, particles = true}) => {
+export const GridBG: React.FC<{dark?: boolean; offset?: number}> = ({dark, offset = 0}) => {
   const frame = useCurrentFrame();
-  const cam = useContext(CamCtx);
-  const abs = frame + offset;
-  const drift = (abs * 0.15) % 80; // slower drift = cleaner video compression
+  const drift = ((frame + offset) * 0.15) % 80; // slower drift = cleaner video compression
   const line = dark ? 'rgba(255,255,255,0.10)' : 'rgba(15,163,160,0.13)';
-  const bgScale = (1 + cam * 0.4) / (1 + cam); // background pushes in only 40% as much as the foreground (parallax)
   return (
     <div style={{position: 'absolute', inset: 0, background: dark ? C.teal700 : C.paper, overflow: 'hidden'}}>
-      <div style={{position: 'absolute', inset: 0, transform: `scale(${bgScale})`}}>
-        <div
-          style={{
-            position: 'absolute',
-            inset: -80,
-            backgroundImage: `linear-gradient(${line} 2px, transparent 2px), linear-gradient(90deg, ${line} 2px, transparent 2px)`,
-            backgroundSize: '80px 80px',
-            transform: `translate(${drift}px, ${drift}px)`,
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            bottom: -420,
-            width: 1700,
-            height: 800,
-            marginLeft: -850,
-            borderRadius: '50%',
-            background: `radial-gradient(closest-side, ${dark ? 'rgba(94,234,212,0.35)' : 'rgba(94,234,212,0.30)'}, transparent)`,
-            opacity: 0.9 + 0.1 * Math.sin(abs / 40),
-          }}
-        />
-        {/* two soft breathing glows (teal top-left, coral top-right) */}
-        <div style={{position: 'absolute', left: '-8%', top: '-12%', width: '52%', height: '48%', borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(94,234,212,0.28), transparent)', transform: `translate(${Math.sin(abs / 70) * 40}px, ${Math.cos(abs / 90) * 26}px)`}} />
-        <div style={{position: 'absolute', right: '-10%', top: '-8%', width: '44%', height: '40%', borderRadius: '50%', background: 'radial-gradient(closest-side, rgba(255,106,92,0.12), transparent)', transform: `translate(${Math.cos(abs / 80) * 36}px, ${Math.sin(abs / 100) * 24}px)`}} />
-        {particles && <Particles offset={offset} tone={dark ? 'light' : 'dark'} />}
-      </div>
+      <div
+        style={{
+          position: 'absolute',
+          inset: -80,
+          backgroundImage: `linear-gradient(${line} 2px, transparent 2px), linear-gradient(90deg, ${line} 2px, transparent 2px)`,
+          backgroundSize: '80px 80px',
+          transform: `translate(${drift}px, ${drift}px)`,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: -420,
+          width: 1700,
+          height: 800,
+          marginLeft: -850,
+          borderRadius: '50%',
+          background: `radial-gradient(closest-side, ${dark ? 'rgba(94,234,212,0.35)' : 'rgba(94,234,212,0.30)'}, transparent)`,
+        }}
+      />
     </div>
   );
 };
 
 /* ------------------------------------------------------------------ */
-/* C2  BlurText / AnimText — professional text animations               */
-/*  mode: 'blur' (default) | 'chars' | 'mask' | 'flip' | 'zoom' | 'drop' */
-/*  shine: a light sweep glides across the finished text (loops)         */
-/*  float: letters/words keep gently bobbing after they appear           */
-/*  NOTE: 'chars' splits letters, so use it for English only (Bengali    */
-/*  conjuncts would break) — Bengali text should use blur/mask/flip.     */
+/* C2  BlurText — word-by-word blur -> sharp (Reference scene 1 look)  */
 /* ------------------------------------------------------------------ */
-export type TextMode = 'blur' | 'chars' | 'mask' | 'flip' | 'zoom' | 'drop';
+export type TextVariant = 'blur' | 'rise' | 'pop' | 'letters';
 type BlurTextProps = {
   text: string;
   fontFamily: string;
@@ -123,13 +51,12 @@ type BlurTextProps = {
   color?: string;
   fontWeight?: number;
   start?: number; // frame (relative to the scene)
-  stagger?: number; // frames between words (or letters in 'chars' mode)
+  stagger?: number; // frames between words
   duration?: number; // frames each word takes
-  mode?: TextMode;
-  shine?: boolean;
-  float?: number; // px amplitude of the idle bob (0 = off)
-  exitAt?: number; // frame (relative to the scene) where the text fades/blurs/slides out (14 frames)
-  gradient?: [string, string]; // optional 2-colour gradient fill (text-shadow is replaced by a drop-shadow)
+  variant?: TextVariant; // 'blur' (default, original look) | 'rise' (masked slide-up, springy) | 'pop' (scale + tilt) | 'letters' (per character; Latin text only)
+  shine?: boolean; // light sweep that glides across the text after it appears
+  shineColor?: string;
+  float?: number; // px amplitude of a gentle endless float after the reveal (0 = off)
   style?: React.CSSProperties;
 };
 export const BlurText: React.FC<BlurTextProps> = ({
@@ -141,210 +68,105 @@ export const BlurText: React.FC<BlurTextProps> = ({
   start = 0,
   stagger = 5,
   duration = 20,
-  mode = 'blur',
+  variant = 'blur',
   shine = false,
+  shineColor = 'rgba(255,255,255,0.95)',
   float = 0,
-  exitAt,
-  gradient,
   style,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const units = mode === 'chars' ? Array.from(text) : text.split(' ');
-  const gap = mode === 'chars' ? 0 : fontSize * 0.28;
-  const total = start + (units.length - 1) * stagger + duration;
-  const {textShadow, ...rest} = style ?? {};
-  const fancy = shine || !!gradient;
-  // shine sweep position (loops every 70 frames, only after the text is fully in)
-  const sweep = frame > total ? ((frame - total) % 70) / 70 : -1;
-  const fill = gradient ? gradient : [color, color];
-  const bg = fancy
-    ? `linear-gradient(100deg, ${fill[0]} 0%, ${fill[1]} 100%)`
-    : undefined;
-  const shineLayer = shine && sweep >= 0
-    ? `linear-gradient(105deg, transparent ${sweep * 160 - 40}%, rgba(255,255,255,0.95) ${sweep * 160 - 20}%, transparent ${sweep * 160}%), `
-    : '';
-  const ex = exitAt === undefined ? 0 : interpolate(frame - exitAt, [0, 14], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.in(Easing.cubic)});
-  const exitStyle: React.CSSProperties = exitAt === undefined ? {} : {opacity: 1 - ex, transform: `translateY(${-ex * 34}px) scale(${1 - ex * 0.04})`};
-  const wrapStyle: React.CSSProperties = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    columnGap: gap,
-    fontFamily,
-    fontSize,
-    fontWeight,
-    color,
-    lineHeight: 1.15,
-    ...(fancy
-      ? {
-          backgroundImage: shineLayer + bg,
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          color: 'transparent',
-          filter: textShadow ? `drop-shadow(${String(textShadow).split(' ').slice(0, 3).join(' ')} rgba(42,10,30,0.35))` : undefined,
-        }
-      : {textShadow, ...(ex > 0 ? {filter: `blur(${ex * 10}px)`} : {})}),
-    ...exitStyle,
-    ...rest,
+  const words = text.split(' ');
+  const letters = variant === 'letters';
+  // one "unit" = one word (or, for 'letters', one character). Bengali etc. must NOT be split into letters.
+  let unitIndex = 0;
+  const unit = (content: string, i: number, wordI: number) => {
+    const f = frame - start - i * (letters ? Math.max(1.5, stagger / 3) : stagger);
+    const p = interpolate(f, [0, duration], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+    const sp = spring({frame: f, fps, config: {damping: 12, stiffness: 130, mass: 0.7}});
+    const bob = float ? Math.sin(frame / 20 + wordI * 0.7) * float * p : 0;
+    let st: React.CSSProperties;
+    if (variant === 'rise' || letters) {
+      st = {opacity: Math.min(1, sp * 2), transform: `translateY(${(1 - sp) * 0.9 * fontSize + bob}px)`, filter: letters ? `blur(${(1 - p) * 8}px)` : undefined};
+    } else if (variant === 'pop') {
+      st = {opacity: Math.min(1, sp * 2), transform: `translateY(${bob}px) scale(${0.3 + 0.7 * sp}) rotate(${(1 - sp) * -9}deg)`};
+    } else {
+      st = {opacity: p, filter: `blur(${(1 - p) * 18}px)`, transform: `translateY(${(1 - p) * 28 + bob}px)`};
+    }
+    // shine: a soft highlight band (overlay copy, so text-shadow / colour of the real text stay untouched)
+    const sweep = ((frame - start - 24 - wordI * 4) % 96) / 34; // 0..1 sweeps across, then rests
+    const showShine = shine && sweep >= 0 && sweep <= 1 && frame - start > duration + 10;
+    return (
+      <span key={i} style={{display: 'inline-block', position: 'relative', whiteSpace: 'pre', ...st}}>
+        {content}
+        {showShine && (
+          <span
+            aria-hidden
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              color: 'transparent',
+              backgroundImage: `linear-gradient(100deg, transparent 35%, ${shineColor} 50%, transparent 65%)`,
+              backgroundSize: '300% 100%',
+              backgroundPosition: `${100 - sweep * 100}% 0`,
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+            }}
+          >
+            {content}
+          </span>
+        )}
+      </span>
+    );
   };
   return (
-    <div style={wrapStyle}>
-      {units.map((w, i) => {
-        const local = frame - start - i * stagger;
-        const p = interpolate(local, [0, duration], [0, 1], {
-          extrapolateLeft: 'clamp',
-          extrapolateRight: 'clamp',
-          easing: Easing.out(Easing.cubic),
-        });
-        const sp = spring({frame: local, fps, config: {damping: 11, stiffness: 140, mass: 0.7}});
-        const idle = float ? Math.sin((frame + i * 6) / 12) * float * Math.min(1, p) : 0;
-        const unit = w === ' ' ? '\u00A0' : w;
-        let inner: React.CSSProperties = {};
-        let outer: React.CSSProperties = {display: 'inline-block'};
-        if (mode === 'blur') {
-          inner = {opacity: p, filter: `blur(${(1 - p) * 18}px)`, transform: `translateY(${(1 - p) * 28 + idle}px)`};
-        } else if (mode === 'chars') {
-          inner = {opacity: Math.min(1, sp * 2), transform: `translateY(${(1 - sp) * 70 + idle}px) rotate(${(1 - sp) * 14}deg) scale(${0.5 + 0.5 * sp})`, filter: `blur(${(1 - p) * 8}px)`};
-        } else if (mode === 'mask') {
-          outer = {display: 'inline-block', overflow: 'hidden', paddingBottom: fontSize * 0.14, marginBottom: -fontSize * 0.14, paddingTop: fontSize * 0.08, marginTop: -fontSize * 0.08};
-          inner = {transform: `translateY(${(1 - p) * 115 + idle}%)`};
-        } else if (mode === 'flip') {
-          outer = {display: 'inline-block', perspective: 900};
-          inner = {opacity: Math.min(1, p * 2), transform: `rotateX(${(1 - sp) * -90}deg) translateY(${idle}px)`, transformOrigin: '50% 100%'};
-        } else if (mode === 'zoom') {
-          inner = {opacity: p, filter: `blur(${(1 - p) * 14}px)`, transform: `scale(${2.4 - 1.4 * sp + idle * 0.004})`};
-        } else if (mode === 'drop') {
-          inner = {opacity: Math.min(1, sp * 2), transform: `translateY(${(1 - sp) * -120 + idle}px) scaleY(${0.7 + 0.3 * sp})`};
-        }
-        return (
-          <span key={i} style={outer}>
-            <span style={{display: 'inline-block', ...inner}}>{unit}</span>
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        columnGap: fontSize * 0.28,
+        fontFamily,
+        fontSize,
+        fontWeight,
+        color,
+        lineHeight: 1.15,
+        ...style,
+      }}
+    >
+      {words.map((w, wi) =>
+        letters ? (
+          <span key={wi} style={{display: 'inline-flex'}}>
+            {Array.from(w).map((ch) => unit(ch, unitIndex++, wi))}
           </span>
-        );
-      })}
+        ) : (
+          unit(w, wi, wi)
+        ),
+      )}
     </div>
   );
 };
 
-/* ------------------------------------------------------------------ */
-/* C2b SkillOrbit — skills circle around the head like a halo          */
-/*  Place it INSIDE the same parent as the portrait. Items on the back  */
-/*  half of the ring pass BEHIND the portrait (zIndex 1), items on the  */
-/*  front half pass in FRONT of it (zIndex 20). Give the portrait       */
-/*  wrapper zIndex: 10.                                                 */
-/* ------------------------------------------------------------------ */
-export const SkillOrbit: React.FC<{
-  items: {icon: GlyphName; label: string}[];
-  cx: number; // centre of the ring (px, parent coordinates) — put it at the top of the head
-  cy: number;
-  rx: number; // horizontal radius
-  ry: number; // vertical radius (small = flat halo seen from the front)
-  chip?: number; // chip size px
-  start?: number; // frame the orbit fades in
-  speed?: number; // degrees per frame
-  showLabel?: boolean;
-  ring?: boolean;
-}> = ({items, cx, cy, rx, ry, chip = 96, start = 0, speed = 1.5, showLabel = true, ring = true}) => {
+/* TextReveal — wraps ANY single text block (labels, badges, bengali lines ...):
+   springy rise + blur-in, then an optional gentle float. Same look in every format. */
+export const TextReveal: React.FC<{start?: number; float?: number; from?: 'up' | 'down' | 'left' | 'right'; children: React.ReactNode; style?: React.CSSProperties}> = ({
+  start = 0,
+  float = 0,
+  from = 'up',
+  children,
+  style,
+}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const appear = spring({frame: frame - start, fps, config: {damping: 18, stiffness: 70}});
-  if (appear <= 0.001) return null;
-  const n = items.length;
-  // speed curve: starts slow (35%), eases up to full speed over RAMP frames, then stays constant.
-  // closed-form integral of  w(t) = speed * (A + (1-A) * smoothstep(t / RAMP))
-  const t = Math.max(0, frame - start);
-  const A = 0.35;
-  const RAMP = 48;
-  const u = Math.min(1, t / RAMP);
-  const I = t <= RAMP ? RAMP * (u * u * u - (u * u * u * u) / 2) : RAMP / 2 + (t - RAMP);
-  const base = speed * (A * t + (1 - A) * I);
+  const sp = spring({frame: frame - start, fps, config: {damping: 14, stiffness: 120, mass: 0.7}});
+  const p = Math.min(1, Math.max(0, sp));
+  const d = (1 - sp) * 34;
+  const dx = from === 'left' ? -d : from === 'right' ? d : 0;
+  const dy = from === 'up' ? d : from === 'down' ? -d : 0;
+  const bob = float ? Math.sin((frame - start) / 22) * float * p : 0;
   return (
-    <>
-      {ring && (
-        <svg
-          width={rx * 2 + 60}
-          height={ry * 2 + 60}
-          style={{position: 'absolute', left: cx - rx - 30, top: cy - ry - 30, zIndex: 0, opacity: 0.55 * appear, overflow: 'visible'}}
-        >
-          <ellipse cx={rx + 30} cy={ry + 30} rx={rx * appear} ry={ry * appear} fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={3} strokeDasharray="4 14" strokeLinecap="round" />
-          <ellipse cx={rx + 30} cy={ry + 30} rx={rx * appear} ry={ry * appear} fill="none" stroke={C.teal300} strokeWidth={1.5} opacity={0.6} />
-        </svg>
-      )}
-      {items.map((it, i) => {
-        // each chip flies in one after another (from the head centre, rising up) and settles on the orbit
-        const e = spring({frame: frame - start - 4 - i * 6, fps, config: {damping: 13, stiffness: 80}});
-        if (e <= 0.001) return null;
-        const a = ((base + (360 / n) * i) * Math.PI) / 180;
-        const x = Math.cos(a) * rx * e;
-        const depth = Math.sin(a); // +1 = front (near viewer), -1 = back
-        const y = depth * ry * e - (1 - e) * 50;
-        const sc = (0.78 + 0.22 * ((depth + 1) / 2)) * (0.45 + 0.55 * Math.min(1, e)); // nearer = bigger
-        const op = (0.55 + 0.45 * ((depth + 1) / 2)) * Math.min(1, e * 1.8);
-        return (
-          <div
-            key={it.label}
-            style={{
-              position: 'absolute',
-              left: cx + x - chip / 2,
-              top: cy + y - chip / 2,
-              width: chip,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 6,
-              zIndex: depth > 0 ? 20 : 1,
-              opacity: op,
-              transform: `scale(${sc})`,
-              filter: depth > 0 ? undefined : 'blur(0.6px)',
-            }}
-          >
-            <div
-              style={{
-                width: chip,
-                height: chip,
-                borderRadius: chip * 0.3,
-                background: `linear-gradient(145deg, ${C.white}, ${C.teal100})`,
-                border: `3px solid ${C.white}`,
-                boxShadow: `0 14px 30px rgba(42,10,30,0.28), 0 0 0 3px rgba(15,163,160,0.35), 0 0 ${depth > 0 ? 34 : 18}px rgba(94,234,212,0.6)`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transform: `rotate(${Math.sin(a * 2) * 6}deg)`,
-              }}
-            >
-              <Glyph name={it.icon} size={chip * 0.56} color={C.teal700} stroke={3.2} />
-            </div>
-            {showLabel && (
-              <div style={{fontFamily: F.role, fontWeight: 800, fontSize: chip * 0.26, color: C.slate, whiteSpace: 'nowrap', textShadow: '0 2px 10px rgba(255,255,255,0.9)'}}>
-                {it.label}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </>
-  );
-};
-
-/* ------------------------------------------------------------------ */
-/* Card3D helpers — gentle 3D tilt, moving shadow and a light sweep.    */
-/* Used by AppCard and SkillCard so every card feels like one family.   */
-/* ------------------------------------------------------------------ */
-const cardTilt = (frame: number, delay: number, s: number) => {
-  const ry = Math.sin((frame + delay * 5) / 38) * 7 * s + (1 - s) * -38; // enters turned, then sways
-  const rx = Math.cos((frame + delay * 3) / 46) * 4 * s;
-  return {ry, rx, transform: `perspective(900px) rotateY(${ry}deg) rotateX(${rx}deg)`, shadowX: -ry * 1.8, shadowY: 26 + rx * 1.5};
-};
-const CardShine: React.FC<{frame: number; delay: number}> = ({frame, delay}) => {
-  const t = frame - delay - 26;
-  const x = t < 0 ? -100 : (((t % 110) / 110) * 170) - 35; // sweeps every ~3.7 s
-  return (
-    <>
-      <div style={{position: 'absolute', inset: 0, background: 'linear-gradient(145deg, rgba(255,255,255,0.22), rgba(255,255,255,0) 42%)', pointerEvents: 'none'}} />
-      <div style={{position: 'absolute', inset: 0, background: `linear-gradient(110deg, transparent ${x - 16}%, rgba(255,255,255,0.55) ${x}%, transparent ${x + 16}%)`, pointerEvents: 'none'}} />
-    </>
+    <div style={{opacity: Math.min(1, p * 1.6), filter: `blur(${(1 - p) * 10}px)`, transform: `translate(${dx}px, ${dy + bob}px)`, ...style}}>{children}</div>
   );
 };
 
@@ -397,7 +219,7 @@ export const Badge: React.FC<BadgeProps> = ({
       }}
     >
       <Glyph name={icon} size={32} color={light ? C.teal700 : C.white} stroke={3.6} />
-      {text}
+      <TextReveal start={delay + 6} from="left">{text}</TextReveal>
     </div>
   );
 };
@@ -419,7 +241,6 @@ type PhoneProps = {
   statusFg?: string; // colour of the status-bar icons
   zoomTo?: number; // optional slow push-in (1 = off) while scrolling, so small text becomes readable
   focusY?: number; // 0..1 of the image height the push-in zooms towards
-  float?: number; // px amplitude of the gentle floating motion (0 = off)
   style?: React.CSSProperties;
 };
 export const PhoneMock: React.FC<PhoneProps> = ({
@@ -435,14 +256,11 @@ export const PhoneMock: React.FC<PhoneProps> = ({
   statusFg = C.slate,
   zoomTo = 1,
   focusY = 0.5,
-  float = 6,
   style,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const s = spring({frame: frame - delay, fps, config: {damping: 14, stiffness: 100}});
-  const fy = Math.sin((frame + delay * 5) / 22) * float * Math.min(1, s); // float up/down
-  const sway = Math.sin((frame + delay * 3) / 55) * 3.5 * Math.min(1, s); // slow 3D sway
   const bezel = 14;
   const innerW = width - bezel * 2;
   const innerH = height - bezel * 2;
@@ -463,12 +281,12 @@ export const PhoneMock: React.FC<PhoneProps> = ({
         width,
         height,
         borderRadius: 54,
-        background: `linear-gradient(160deg, ${C.slateSoft} 0%, ${C.slate} 100%)`,
+        background: `linear-gradient(160deg, #2C4A6B 0%, ${C.slate} 100%)`,
         padding: bezel,
         boxSizing: 'border-box',
         boxShadow: '0 40px 80px rgba(4,48,46,0.35), 0 0 0 2px rgba(255,255,255,0.18) inset',
         opacity: Math.min(1, s * 1.4),
-        transform: `perspective(1400px) translateY(${(1 - s) * 120 + fy}px) rotate(${tilt * s}deg) rotateY(${sway}deg) scale(${0.85 + 0.15 * s})`,
+        transform: `translateY(${(1 - s) * 120}px) rotate(${tilt * s}deg) scale(${0.85 + 0.15 * s})`,
         ...style,
       }}
     >
@@ -536,7 +354,6 @@ export const AppCard: React.FC<AppCardProps> = ({src, label, size = 300, delay =
   const {fps} = useVideoConfig();
   const s = spring({frame: frame - delay, fps, config: {damping: 13, stiffness: 110}});
   const y = Math.sin((frame + delay * 4) / 16) * bob;
-  const tl = cardTilt(frame, delay, s);
   return (
     <div
       style={{
@@ -552,26 +369,23 @@ export const AppCard: React.FC<AppCardProps> = ({src, label, size = 300, delay =
     >
       <div
         style={{
-          position: 'relative',
           width: size,
           height: size,
           borderRadius: size * 0.16,
           overflow: 'hidden',
           background: C.white,
-          transform: tl.transform,
-          // same teal ring + soft glow on every icon => mixed icon styles look like one set (shadow follows the tilt)
+          // same teal ring + soft glow on every icon => mixed icon styles look like one set
           boxShadow: highlight
-            ? `${tl.shadowX}px ${tl.shadowY}px 56px rgba(4,48,46,0.22), 0 0 0 5px ${C.gold}, 0 0 64px rgba(245,184,61,0.55)`
-            : `${tl.shadowX}px ${tl.shadowY}px 56px rgba(4,48,46,0.22), 0 0 0 4px rgba(15,163,160,0.30), 0 0 56px rgba(94,234,212,0.45)`,
+            ? `0 26px 56px rgba(4,48,46,0.22), 0 0 0 5px ${C.gold}, 0 0 64px rgba(245,184,61,0.55)`
+            : '0 26px 56px rgba(4,48,46,0.22), 0 0 0 4px rgba(15,163,160,0.30), 0 0 56px rgba(94,234,212,0.45)',
           border: `3px solid ${C.white}`,
         }}
       >
         <Img src={src} style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
-        <CardShine frame={frame} delay={delay} />
       </div>
-      <div style={{fontFamily, fontWeight: 700, fontSize: 26, color: C.slate, textAlign: 'center', lineHeight: 1.25, width: size + labelPad, margin: `0 ${-labelPad / 2}px`}}>
+      <TextReveal start={delay + 8} style={{fontFamily, fontWeight: 700, fontSize: 26, color: C.slate, textAlign: 'center', lineHeight: 1.25, width: size + labelPad, margin: `0 ${-labelPad / 2}px`}}>
         {label}
-      </div>
+      </TextReveal>
     </div>
   );
 };
@@ -716,7 +530,6 @@ export const SkillCard: React.FC<{icon: GlyphName; label: string; size?: number;
   const {fps} = useVideoConfig();
   const s = spring({frame: frame - delay, fps, config: {damping: 13, stiffness: 110}});
   const y = Math.sin((frame + delay * 4) / 16) * bob;
-  const tl = cardTilt(frame, delay, s);
   return (
     <div
       style={{
@@ -731,14 +544,11 @@ export const SkillCard: React.FC<{icon: GlyphName; label: string; size?: number;
     >
       <div
         style={{
-          position: 'relative',
-          overflow: 'hidden',
           width: size,
           height: size,
           borderRadius: size * 0.16,
           background: `linear-gradient(145deg, ${C.white} 0%, ${C.teal100} 100%)`,
-          transform: tl.transform,
-          boxShadow: `${tl.shadowX}px ${tl.shadowY}px 56px rgba(4,48,46,0.22), 0 0 0 4px rgba(15,163,160,0.30), 0 0 56px rgba(94,234,212,0.45)`,
+          boxShadow: '0 26px 56px rgba(4,48,46,0.22), 0 0 0 4px rgba(15,163,160,0.30), 0 0 56px rgba(94,234,212,0.45)',
           border: `3px solid ${C.white}`,
           display: 'flex',
           alignItems: 'center',
@@ -746,9 +556,115 @@ export const SkillCard: React.FC<{icon: GlyphName; label: string; size?: number;
         }}
       >
         <Glyph name={icon} size={size * 0.5} color={C.teal700} stroke={3.2} />
-        <CardShine frame={frame} delay={delay} />
       </div>
-      <div style={{fontFamily: F.role, fontWeight: 800, fontSize: labelSize, color: C.slate, textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.2}}>{label}</div>
+      <TextReveal start={delay + 8} style={{fontFamily: F.role, fontWeight: 800, fontSize: labelSize, color: C.slate, textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.2}}>{label}</TextReveal>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* SkillOrbit — the 5 skill icons circle (ellipse orbit) above the head */
+/* 3D feel: far side = smaller + dimmer + soft blur, near side = bigger + bright.  */
+/* Render it TWICE around the portrait so icons pass BEHIND and IN FRONT of the photo:  */
+/*   <SkillOrbit {...o} layer="back" />  <Portrait/>  <SkillOrbit {...o} layer="front" />  */
+/* Everything is frame-based (no CSS animation) => smooth, deterministic, no jitter.    */
+/* ------------------------------------------------------------------ */
+export const portraitOrbit = (left: number, top: number, size: number, k = 1) => ({
+  cx: left + size / 2,
+  cy: top - (size * (k - 1)) / 2 - size * 0.06 * k, // k = current zoom scale of the portrait
+  rx: size * 0.52 * k,
+  ry: size * 0.09 * k,
+});
+
+type OrbitProps = {
+  cx: number; // centre x (px)
+  cy: number; // centre y (px)
+  rx: number; // horizontal radius
+  ry: number; // vertical radius (small = flat, "halo" look)
+  size?: number; // icon chip size at full depth
+  start?: number; // frame (inside the scene) where the pop-in starts
+  period?: number; // frames for one full turn (bigger = slower)
+  layer?: 'back' | 'front' | 'all';
+  ring?: boolean; // faint glow ring along the path
+  tilt?: number; // degrees; tiny tilt makes the orbit feel less flat
+  still?: boolean; // true = frozen, fully-opened pose (for the static Cover/thumbnail)
+  phase?: number; // still only: rotation angle (radians) of the frozen pose
+};
+export const SkillOrbit: React.FC<OrbitProps> = ({cx, cy, rx, ry, size = 84, start = 0, period = 300, layer = 'all', ring = true, tilt = -4, still = false, phase = 0}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const n = SKILLS.length;
+  const f = still ? 9999 : frame - start; // still => skip all pop-in timing (fully open)
+  if (f < 0) return null;
+  const draw = interpolate(f, [0, 28], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+  const TAU = Math.PI * 2;
+  const want = (depth: number) => layer === 'all' || (layer === 'front' ? depth >= 0 : depth < 0);
+
+  const items: React.ReactNode[] = [];
+  SKILLS.forEach((k, i) => {
+    const sp = spring({frame: f - i * 5, fps, config: {damping: 12, stiffness: 110, mass: 0.8}});
+    const pop = Math.max(0, sp);
+    const grow = 0.55 + 0.45 * Math.min(1, pop); // orbit opens up while the icons pop in
+    const ang = (i / n) * TAU + (still ? phase : (f / period) * TAU) + (1 - Math.min(1, pop)) * 1.6; // spin-in, then steady loop
+    const place = (a: number) => {
+      const depth = Math.sin(a); // +1 = nearest (front, lower arc), -1 = farthest (back, upper arc)
+      return {x: Math.cos(a) * rx * grow, y: depth * ry * grow, depth, t: (depth + 1) / 2};
+    };
+    const m = place(ang);
+    // glow trail: 4 soft dots behind each icon
+    for (let j = 4; j >= 1; j--) {
+      const d = place(ang - j * 0.17);
+      if (!want(d.depth)) continue;
+      const dot = (7 - j) * (0.6 + 0.4 * d.t);
+      items.push(
+        <div key={`t${i}-${j}`} style={{position: 'absolute', left: d.x - dot / 2, top: d.y - dot / 2, width: dot, height: dot, borderRadius: '50%', background: C.teal300, opacity: Math.min(1, pop) * (0.55 - j * 0.1) * (0.4 + 0.6 * d.t), boxShadow: `0 0 ${10 + j * 2}px rgba(94,234,212,0.9)`}} />,
+      );
+    }
+    if (!want(m.depth)) return;
+    const sc = (0.62 + 0.38 * m.t) * (0.3 + 0.7 * pop);
+    items.push(
+      <div
+        key={k.label}
+        style={{
+          position: 'absolute',
+          left: m.x - size / 2,
+          top: m.y - size / 2,
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          background: `linear-gradient(145deg, ${C.white} 0%, ${C.teal100} 100%)`,
+          border: `3px solid ${C.white}`,
+          boxShadow: `0 ${10 + 14 * m.t}px ${24 + 18 * m.t}px rgba(4,48,46,${0.14 + 0.14 * m.t}), 0 0 0 3px rgba(15,163,160,${0.18 + 0.2 * m.t}), 0 0 ${20 + 26 * m.t}px rgba(94,234,212,${0.25 + 0.4 * m.t})`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: Math.min(1, pop * 1.5) * (0.5 + 0.5 * m.t),
+          filter: `blur(${((1 - m.t) * 2.2).toFixed(2)}px)`,
+          transform: `scale(${sc})`,
+        }}
+      >
+        <Glyph name={k.icon} size={size * 0.54} color={C.teal700} stroke={3.4} />
+      </div>,
+    );
+  });
+
+  const W = rx * 2 + 40;
+  const H = ry * 2 + 40;
+  return (
+    <div style={{position: 'absolute', left: 0, top: 0, width: 0, height: 0, pointerEvents: 'none'}}>
+      <div style={{position: 'absolute', left: cx, top: cy, width: 0, height: 0, transform: `rotate(${tilt}deg)`}}>
+        {ring && (
+          <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{position: 'absolute', left: -W / 2, top: -H / 2, overflow: 'visible', filter: 'drop-shadow(0 0 8px rgba(94,234,212,0.8))'}}>
+            {(layer === 'all' || layer === 'back') && (
+              <ellipse cx={W / 2} cy={H / 2} rx={rx} ry={ry} fill="none" stroke={C.teal300} strokeWidth={3} strokeLinecap="round" pathLength={100} strokeDasharray={`${draw * 100} 100`} opacity={0.4} />
+            )}
+            {(layer === 'all' || layer === 'front') && (
+              <path d={`M ${W / 2 - rx} ${H / 2} A ${rx} ${ry} 0 0 0 ${W / 2 + rx} ${H / 2}`} fill="none" stroke={C.teal300} strokeWidth={4} strokeLinecap="round" pathLength={100} strokeDasharray={`${draw * 100} 100`} opacity={0.85} />
+            )}
+          </svg>
+        )}
+        {items}
+      </div>
     </div>
   );
 };
@@ -778,10 +694,10 @@ export const ContactRow: React.FC<{start: number; size?: number; direction?: 'ro
       }}
     >
       {CONTACT.map((c, i) => {
-        const p = interpolate(frame - start - i * 8, [0, 18], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+        const p = interpolate(frame - start - i * 8, [0, 18], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
         return (
           <div key={c.text + i} style={{display: 'flex', alignItems: 'center', gap: size * 0.4, opacity: p, transform: `translateY(${(1 - p) * 16}px)`}}>
-            <div style={{width: size * 1.6, height: size * 1.6, borderRadius: '50%', background: C.slate, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${1 + 0.06 * Math.sin((frame - start - i * 8) / 9) * p})`, boxShadow: `0 0 ${12 + 10 * Math.sin((frame - start) / 9) * p}px rgba(255,106,92,0.55)`}}>
+            <div style={{width: size * 1.6, height: size * 1.6, borderRadius: '50%', background: C.slate, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
               <Glyph name={c.icon} size={size * 0.95} color={C.white} stroke={3.4} />
             </div>
             <div style={{fontFamily: F.tagline, fontWeight: 800, fontSize: size, color: C.slate}}>{c.text}</div>

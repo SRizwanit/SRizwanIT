@@ -1,13 +1,16 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import {TransitionSeries} from '@remotion/transitions';
-import {SCENE} from './theme';
+import {TransitionSeries, linearTiming} from '@remotion/transitions';
+import {fade} from '@remotion/transitions/fade';
+import {slide} from '@remotion/transitions/slide';
+import {SCENE, TRANSITION} from './theme';
 import {SceneHook, SceneIntro, SceneApps, SceneWeb, SceneSkills, SceneOutro} from './Scenes';
 import {AudioTrack} from './AudioTrack';
-import {Camera, ColorGrade} from './Components';
-import {PRESENTATIONS, TRANSITION_TIMING} from './Transitions';
+import {ColorGrade} from './Components';
 import {SfxTrack} from './SfxTrack';
 import './fonts'; // make sure every font loads
+
+const t = linearTiming({durationInFrames: TRANSITION});
 
 export const Video: React.FC = () => {
   return (
@@ -15,39 +18,27 @@ export const Video: React.FC = () => {
       <AbsoluteFill style={{filter: 'saturate(1.06) contrast(1.03)'}}>
       <TransitionSeries>
         <TransitionSeries.Sequence durationInFrames={SCENE.hook}>
-          <Camera duration={SCENE.hook} push={0.035}>
-            <SceneHook />
-          </Camera>
+          <SceneHook />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={PRESENTATIONS[0]} timing={TRANSITION_TIMING} />
+        <TransitionSeries.Transition presentation={fade()} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.intro}>
-          <Camera duration={SCENE.intro} push={0.03}>
-            <SceneIntro />
-          </Camera>
+          <SceneIntro />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={PRESENTATIONS[1]} timing={TRANSITION_TIMING} />
+        <TransitionSeries.Transition presentation={fade()} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.apps}>
-          <Camera duration={SCENE.apps} push={0.035}>
-            <SceneApps />
-          </Camera>
+          <SceneApps />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={PRESENTATIONS[2]} timing={TRANSITION_TIMING} />
+        <TransitionSeries.Transition presentation={slide({direction: 'from-bottom'})} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.web}>
-          <Camera duration={SCENE.web} push={0.035}>
-            <SceneWeb />
-          </Camera>
+          <SceneWeb />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={PRESENTATIONS[3]} timing={TRANSITION_TIMING} />
+        <TransitionSeries.Transition presentation={slide({direction: 'from-bottom'})} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.skills}>
-          <Camera duration={SCENE.skills} push={0.035}>
-            <SceneSkills />
-          </Camera>
+          <SceneSkills />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={PRESENTATIONS[4]} timing={TRANSITION_TIMING} />
+        <TransitionSeries.Transition presentation={fade()} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.outro}>
-          <Camera duration={SCENE.outro} push={0.035}>
-            <SceneOutro />
-          </Camera>
+          <SceneOutro />
         </TransitionSeries.Sequence>
       </TransitionSeries>
       </AbsoluteFill>
