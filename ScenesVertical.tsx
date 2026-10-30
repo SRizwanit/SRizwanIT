@@ -2,9 +2,10 @@
 // Only the LAYOUT is different. Rendered as HD only (1080x1920).
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {C, FILL_BG, START} from './theme';
+import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START, STATS} from './theme';
 import {F} from './fonts';
-import {AppCard, Badge, BlurText, CTA, GridBG, PhoneMock, Smile, Squiggle} from './Components';
+import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle, StatChip} from './Components';
+import {SKILLS} from './Icons';
 
 import me from './mypicture.jpg';
 import appS2 from './app-islami-bishwakosh-s2.jpg';
@@ -107,9 +108,9 @@ export const SceneIntroV: React.FC = () => {
       </div>
 
       {/* pop-ups float up around the photo */}
-      <Badge text="Android Apps" delay={FOCUS + 22} style={{left: 600, top: 170}} />
-      <Badge text="Websites" delay={FOCUS + 36} variant="light" style={{left: 40, top: 820}} />
-      <Badge text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 600, top: 850}} />
+      <Badge icon="app" text="Android Apps" delay={FOCUS + 22} style={{left: 600, top: 170}} />
+      <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{left: 40, top: 820}} />
+      <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 600, top: 850}} />
 
       {/* text block (centered): name first, then role + CTA appear under it */}
       <div
@@ -167,7 +168,7 @@ export const SceneAppsV: React.FC = () => {
           size={SIZE}
           labelPad={60}
           highlight={a.label === 'RizwanTask'}
-          delay={14 + (offset + i) * 6}
+          delay={APP_FIRST + (offset + i) * APP_STAGGER}
           bob={5}
         />
       ))}
@@ -180,7 +181,7 @@ export const SceneAppsV: React.FC = () => {
         <BlurText text="Apps" fontFamily={F.titleApps} fontSize={130} fontWeight={900} color={C.teal700} start={0} />
         <Squiggle width={300} start={14} />
       </div>
-      <div style={{position: 'absolute', top: 400, bottom: 60, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 70}}>
+      <div style={{position: 'absolute', top: 400, bottom: 220, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 70}}>
         {row(APPS.slice(0, 2), 0)}
         {row(APPS.slice(2, 4), 2)}
         {row(APPS.slice(4), 4)}
@@ -191,15 +192,16 @@ export const SceneAppsV: React.FC = () => {
 
 /* ---------------- V4  Websites (big centre phone + 2 phones below) ---------------- */
 // Every phone is fully visible: nothing overlaps, nothing touches the screen edge,
-// and the last caption stays clear of the bottom of the 1080x1920 frame.
+// the app header sits BELOW the status bar, and the last caption stays above the Reels bottom UI.
 export const SceneWebV: React.FC = () => {
-  const side = {w: 280, h: 502};
-  const mid = {w: 400, h: 717};
+  const side = {w: 262, h: 470};
+  const mid = {w: 370, h: 663};
   const cap = (txt: string, font: string, size: number, width: number): React.ReactNode => (
     <div style={{width, textAlign: 'center', fontFamily: font, fontWeight: 700, fontSize: size, color: C.teal900, lineHeight: 1.25, marginTop: 16}}>
       {txt}
     </div>
   );
+  const col: React.CSSProperties = {display: 'flex', flexDirection: 'column', alignItems: 'center'};
   return (
     <AbsoluteFill>
       <GridBG offset={START.web} />
@@ -209,19 +211,19 @@ export const SceneWebV: React.FC = () => {
       </div>
 
       <div style={{position: 'absolute', top: 395, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20}}>
-        {/* centre (main) phone */}
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <PhoneMock src={webAI} imgRatio={1371 / 720} width={mid.w} height={mid.h} delay={0} scrollStart={34} scrollDuration={125} tilt={0} />
+        {/* centre (main) phone: slow push-in so the small text becomes readable */}
+        <div style={col}>
+          <PhoneMock src={webAI} imgRatio={1371 / 720} width={mid.w} height={mid.h} delay={0} scrollStart={34} scrollDuration={125} tilt={0} statusBg="#f7f7f7" statusFg={C.teal900} zoomTo={1.3} focusY={0.5} />
           {cap('IslamiPedia AI', F.hello, 38, mid.w)}
         </div>
         {/* two supporting phones, side by side below it */}
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 80}}>
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <PhoneMock src={webS2} imgRatio={1367 / 720} width={side.w} height={side.h} delay={8} scrollStart={42} scrollDuration={125} tilt={-3} />
+          <div style={col}>
+            <PhoneMock src={webS2} imgRatio={1367 / 720} width={side.w} height={side.h} delay={8} scrollStart={42} scrollDuration={125} tilt={-3} statusBg="#02736f" statusFg="#FFFFFF" />
             {cap('ইসলামী বিশ্বকোষ ও আল হাদিস S2', F.bn, 26, side.w + 40)}
           </div>
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <PhoneMock src={webTask} imgRatio={1373 / 720} width={side.w} height={side.h} delay={16} scrollStart={50} scrollDuration={125} tilt={3} />
+          <div style={col}>
+            <PhoneMock src={webTask} imgRatio={1373 / 720} width={side.w} height={side.h} delay={16} scrollStart={50} scrollDuration={125} tilt={3} statusBg="#02110e" statusFg="#CFEEE8" />
             {cap('RizwanTask', F.role, 30, side.w + 40)}
           </div>
         </div>
@@ -229,6 +231,33 @@ export const SceneWebV: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+/* ---------------- V4b  Skills (3 + 2 vector cards, counters) ---------------- */
+export const SceneSkillsV: React.FC = () => (
+  <AbsoluteFill>
+    <GridBG offset={START.skills} />
+    <div style={{position: 'absolute', top: 150, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      <BlurText text="Skills" fontFamily={F.cta} fontSize={130} fontWeight={700} color={C.teal700} start={0} />
+      <Squiggle width={300} start={14} />
+    </div>
+    <div style={{position: 'absolute', top: 430, bottom: 220, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 70}}>
+      <div style={{display: 'flex', justifyContent: 'center', gap: 60}}>
+        {SKILLS.slice(0, 3).map((k, i) => (
+          <SkillCard key={k.label} icon={k.icon} label={k.label} size={270} labelSize={36} delay={SKILL_FIRST + i * SKILL_STAGGER} />
+        ))}
+      </div>
+      <div style={{display: 'flex', justifyContent: 'center', gap: 60}}>
+        {SKILLS.slice(3).map((k, i) => (
+          <SkillCard key={k.label} icon={k.icon} label={k.label} size={270} labelSize={36} delay={SKILL_FIRST + (i + 3) * SKILL_STAGGER} />
+        ))}
+      </div>
+      <div style={{display: 'flex', gap: 30}}>
+        <StatChip value={STATS.apps} label="Apps" delay={62} fontSize={40} />
+        <StatChip value={STATS.websites} label="Websites" delay={74} fontSize={40} />
+      </div>
+    </div>
+  </AbsoluteFill>
+);
 
 /* ---------------- V5  Outro: Please / Don't DM / Now. ---------------- */
 export const SceneOutroV: React.FC = () => {
@@ -270,6 +299,7 @@ export const SceneOutroV: React.FC = () => {
         App &amp; Website Developer
       </div>
       <Squiggle width={300} color={C.teal900} start={92} style={{marginTop: 14}} />
+      <ContactRow start={98} size={34} direction="column" style={{marginTop: 30}} />
     </AbsoluteFill>
   );
 };

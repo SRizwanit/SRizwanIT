@@ -3,9 +3,8 @@ import {AbsoluteFill} from 'remotion';
 import {TransitionSeries, linearTiming} from '@remotion/transitions';
 import {fade} from '@remotion/transitions/fade';
 import {slide} from '@remotion/transitions/slide';
-import {wipe} from '@remotion/transitions/wipe';
 import {SCENE, TRANSITION} from './theme';
-import {SceneHook, SceneIntro, SceneApps, SceneWeb, SceneOutro} from './Scenes';
+import {SceneHook, SceneIntro, SceneApps, SceneWeb, SceneSkills, SceneOutro} from './Scenes';
 import {AudioTrack} from './AudioTrack';
 import {ColorGrade} from './Components';
 import {SfxTrack} from './SfxTrack';
@@ -33,7 +32,11 @@ export const Video: React.FC = () => {
         <TransitionSeries.Sequence durationInFrames={SCENE.web}>
           <SceneWeb />
         </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={wipe({direction: 'from-left'})} timing={t} />
+        <TransitionSeries.Transition presentation={slide({direction: 'from-bottom'})} timing={t} />
+        <TransitionSeries.Sequence durationInFrames={SCENE.skills}>
+          <SceneSkills />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition presentation={fade()} timing={t} />
         <TransitionSeries.Sequence durationInFrames={SCENE.outro}>
           <SceneOutro />
         </TransitionSeries.Sequence>

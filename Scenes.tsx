@@ -1,8 +1,9 @@
 import React from 'react';
 import {AbsoluteFill, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {C, FILL_BG, START} from './theme';
+import {APP_FIRST, APP_STAGGER, C, FILL_BG, SKILL_FIRST, SKILL_STAGGER, START, STATS} from './theme';
 import {F} from './fonts';
-import {AppCard, Badge, BlurText, CTA, GridBG, PhoneMock, Smile, Squiggle} from './Components';
+import {AppCard, Badge, BlurText, ContactRow, CTA, GridBG, PhoneMock, SkillCard, Smile, Squiggle, StatChip} from './Components';
+import {SKILLS} from './Icons';
 
 import me from './mypicture.jpg';
 import appS2 from './app-islami-bishwakosh-s2.jpg';
@@ -102,9 +103,9 @@ export const SceneIntro: React.FC = () => {
       </div>
 
       {/* pop-ups float up around the photo */}
-      <Badge text="Android Apps" delay={FOCUS + 22} style={{left: 590, top: 205}} />
-      <Badge text="Websites" delay={FOCUS + 36} variant="light" style={{left: 80, top: 815}} />
-      <Badge text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 640, top: 790}} />
+      <Badge icon="app" text="Android Apps" delay={FOCUS + 22} style={{left: 590, top: 205}} />
+      <Badge icon="web" text="Websites" delay={FOCUS + 36} variant="light" style={{left: 80, top: 815}} />
+      <Badge icon="ai" text="IslamiPedia AI" delay={FOCUS + 50} style={{left: 640, top: 790}} />
 
       {/* text block: name first, then role + CTA appear under it */}
       <div style={{position: 'absolute', left: 960, top: 150, width: 900, transform: `translateY(${(1 - zoom) * 70}px)`}}>
@@ -140,7 +141,7 @@ export const SceneApps: React.FC = () => {
   const row = (items: typeof APPS, offset: number) => (
     <div style={{display: 'flex', justifyContent: 'center', gap: 90}}>
       {items.map((a, i) => (
-        <AppCard key={a.label + i} src={a.src} label={a.label} fontFamily={a.font} size={260} delay={14 + (offset + i) * 9} bob={5} />
+        <AppCard key={a.label + i} src={a.src} label={a.label} fontFamily={a.font} size={260} delay={APP_FIRST + (offset + i) * APP_STAGGER} bob={5} />
       ))}
     </div>
   );
@@ -161,10 +162,10 @@ export const SceneApps: React.FC = () => {
 
 /* ---------------- D5  S5 Websites ---------------- */
 export const SceneWeb: React.FC = () => {
-  const cols: {src: string; ratio: number; name: string; font: string; w: number; h: number; delay: number; tilt: number}[] = [
-    {src: webS2, ratio: 1367 / 720, name: 'ইসলামী বিশ্বকোষ ও আল হাদিস S2', font: F.bn, w: 360, h: 650, delay: 8, tilt: -3},
-    {src: webAI, ratio: 1371 / 720, name: 'IslamiPedia AI', font: F.hello, w: 420, h: 740, delay: 0, tilt: 0},
-    {src: webTask, ratio: 1373 / 720, name: 'RizwanTask', font: F.role, w: 360, h: 650, delay: 16, tilt: 3},
+  const cols: {src: string; ratio: number; name: string; font: string; w: number; h: number; delay: number; tilt: number; sb: string; fg: string; zoom?: number}[] = [
+    {src: webS2, ratio: 1367 / 720, name: 'ইসলামী বিশ্বকোষ ও আল হাদিস S2', font: F.bn, w: 360, h: 650, delay: 8, tilt: -3, sb: '#02736f', fg: '#FFFFFF'},
+    {src: webAI, ratio: 1371 / 720, name: 'IslamiPedia AI', font: F.hello, w: 420, h: 740, delay: 0, tilt: 0, sb: '#f7f7f7', fg: C.teal900, zoom: 1.3},
+    {src: webTask, ratio: 1373 / 720, name: 'RizwanTask', font: F.role, w: 360, h: 650, delay: 16, tilt: 3, sb: '#02110e', fg: '#CFEEE8'},
   ];
   return (
     <AbsoluteFill>
@@ -176,7 +177,7 @@ export const SceneWeb: React.FC = () => {
       <div style={{position: 'absolute', top: 215, left: 0, right: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 90}}>
         {cols.map((c) => (
           <div key={c.name} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16}}>
-            <PhoneMock src={c.src} imgRatio={c.ratio} width={c.w} height={c.h} delay={c.delay} scrollStart={34 + c.delay} scrollDuration={125} tilt={c.tilt} />
+            <PhoneMock src={c.src} imgRatio={c.ratio} width={c.w} height={c.h} delay={c.delay} scrollStart={34 + c.delay} scrollDuration={125} tilt={c.tilt} statusBg={c.sb} statusFg={c.fg} zoomTo={c.zoom} focusY={0.5} />
             <div style={{fontFamily: c.font, fontWeight: 700, fontSize: 32, color: C.teal900}}>{c.name}</div>
           </div>
         ))}
@@ -184,6 +185,28 @@ export const SceneWeb: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+/* ---------------- D5b  S6 Skills (5 vector cards + counters) ---------------- */
+export const SceneSkills: React.FC = () => (
+  <AbsoluteFill>
+    <GridBG offset={START.skills} />
+    <div style={{position: 'absolute', top: 44, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+      <BlurText text="Skills" fontFamily={F.cta} fontSize={110} fontWeight={700} color={C.teal700} start={0} />
+      <Squiggle width={260} start={14} />
+    </div>
+    <div style={{position: 'absolute', top: 230, bottom: 40, left: 0, right: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 70}}>
+      <div style={{display: 'flex', justifyContent: 'center', gap: 70}}>
+        {SKILLS.map((k, i) => (
+          <SkillCard key={k.label} icon={k.icon} label={k.label} size={270} labelSize={36} delay={SKILL_FIRST + i * SKILL_STAGGER} />
+        ))}
+      </div>
+      <div style={{display: 'flex', gap: 40}}>
+        <StatChip value={STATS.apps} label="Apps" delay={62} fontSize={42} />
+        <StatChip value={STATS.websites} label="Websites" delay={74} fontSize={42} />
+      </div>
+    </div>
+  </AbsoluteFill>
+);
 
 /* ---------------- D6  S6 Outro ---------------- */
 export const SceneOutro: React.FC = () => {
@@ -210,6 +233,7 @@ export const SceneOutro: React.FC = () => {
         App &amp; Website Developer
       </div>
       <Squiggle width={300} color={C.teal900} start={92} style={{marginTop: 14}} />
+      <ContactRow start={98} size={32} direction="row" style={{marginTop: 26}} />
     </AbsoluteFill>
   );
 };

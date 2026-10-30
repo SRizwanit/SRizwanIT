@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "stills = preview frames only | hd | 4k | both"
+        description: "stills/hd/4k/both = 16:9 | vertical-stills/vertical = 9:16 (1080x1920) | feed-stills/feed = 4:5 FEED (1080x1350) | covers = thumbnails (3 PNGs)"
         type: choice
         default: stills
-        options: [stills, hd, 4k, both]
+        options: [stills, hd, 4k, both, vertical-stills, vertical, feed-stills, feed, covers]
       release:
         description: "Also publish the MP4(s) as a GitHub Release"
         type: boolean
@@ -36,6 +36,8 @@ jobs:
             app-osman-goni.jpg app-tablig.jpg app-usila.jpg app-rizwantask.png \
             web-islami-bishwakosh-s2.jpg web-islamipedia-ai.jpg web-rizwantask.jpg \
             package.json index.ts Root.tsx Video.tsx Scenes.tsx Components.tsx \
+            VideoVertical.tsx ScenesVertical.tsx \
+            VideoFeed.tsx ScenesFeed.tsx Icons.tsx Cover.tsx \
             AudioTrack.tsx theme.ts fonts.ts remotion.config.ts assets.d.ts; do
             if [ ! -f "$f" ]; then echo "::error::MISSING FILE: $f"; missing=1; fi
           done
@@ -44,19 +46,23 @@ jobs:
         id: m
         run: |
           mode="${{ github.event.inputs.mode }}"
-          HD='{"name":"HD","scale":1,"crf":14}'
-          K4='{"name":"4K","scale":2,"crf":15}'
+          HD='{"name":"HD","scale":1,"crf":14,"comp":"Intro"}'
+          K4='{"name":"4K","scale":2,"crf":15,"comp":"Intro"}'
+          VT='{"name":"Vertical-HD","scale":1,"crf":14,"comp":"IntroVertical"}'
+          FD='{"name":"Feed-HD","scale":1,"crf":14,"comp":"IntroFeed"}'
           case "$mode" in
             hd)   m="{\"include\":[$HD]}" ;;
             4k)   m="{\"include\":[$K4]}" ;;
             both) m="{\"include\":[$HD,$K4]}" ;;
+            vertical) m="{\"include\":[$VT]}" ;;
+            feed) m="{\"include\":[$FD]}" ;;
             *)    m="{\"include\":[]}" ;;
           esac
           echo "matrix=$m" >> "$GITHUB_OUTPUT"
 
   stills:
     needs: preflight
-    if: ${{ github.event.inputs.mode == 'stills' }}
+    if: ${{ github.event.inputs.mode == 'stills' || github.event.inputs.mode == 'vertical-stills' || github.event.inputs.mode == 'feed-stills' || github.event.inputs.mode == 'covers' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -95,22 +101,38 @@ jobs:
           node "$RUNNER_TEMP/pin.js"
       - run: npm install --no-audit --no-fund --legacy-peer-deps
       - run: npx remotion browser ensure
+      - name: Pick composition (16:9 / 9:16 / 4:5)
+        run: |
+          case "${{ github.event.inputs.mode }}" in
+            vertical-stills) echo "COMP=IntroVertical" >> "$GITHUB_ENV" ;;
+            feed-stills) echo "COMP=IntroFeed" >> "$GITHUB_ENV" ;;
+            *) echo "COMP=Intro" >> "$GITHUB_ENV" ;;
+          esac
       - name: Composition sanity check
         run: npx remotion compositions index.ts
       - name: Render preview stills
         run: |
-          # moments with the most on screen (scene starts: 0,108,231,354,597,770)
-          for f in 80 200 320 520 640 720 800 890; do
-            npx remotion still index.ts Intro "still-$(printf %03d $f).png" --frame=$f
-          done
+          if [ "${{ github.event.inputs.mode }}" = "covers" ]; then
+            # static thumbnails for all three formats
+            npx remotion still index.ts CoverWide "cover-wide-16x9.png"
+            npx remotion still index.ts CoverVertical "cover-vertical-9x16.png"
+            npx remotion still index.ts CoverFeed "cover-feed-4x5.png"
+          else
+            # moments with the most on screen (scene starts: 0,108,354,597,770,908)
+            for f in 80 200 330 420 520 720 860 1000; do
+              npx remotion still index.ts "$COMP" "still-$COMP-$(printf %03d $f).png" --frame=$f
+            done
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: stills
-          path: still-*.png
+          path: |
+            still-*.png
+            cover-*.png
 
   render:
     needs: preflight
-    if: ${{ github.event.inputs.mode != 'stills' }}
+    if: ${{ github.event.inputs.mode != 'stills' && github.event.inputs.mode != 'vertical-stills' && github.event.inputs.mode != 'feed-stills' && github.event.inputs.mode != 'covers' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
@@ -154,7 +176,7 @@ jobs:
       - run: npx remotion browser ensure
       - name: Render ${{ matrix.name }}
         run: |
-          npx remotion render index.ts Intro "Rizwan-${{ matrix.name }}.mp4" \
+          npx remotion render index.ts ${{ matrix.comp }} "Rizwan-${{ matrix.name }}.mp4" \
             --codec=h264 --crf=${{ matrix.crf }} --scale=${{ matrix.scale }} \
             --audio-codec=aac
       - name: Show output info
@@ -183,5 +205,6 @@ jobs:
         run: |
           gh release create "video-${{ github.run_number }}" Rizwan-*.mp4 \
             --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
             --title "Rizwan Video #${{ github.run_number }}" \
             --notes "Rendered by GitHub Actions (mode: ${{ github.event.inputs.mode }})."

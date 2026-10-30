@@ -2,13 +2,17 @@
   "name": "rizwan-intro-video",
   "version": "1.0.0",
   "private": true,
-  "description": "Rizwan Chowdhury - 30s intro video (Remotion)",
+  "description": "Rizwan Chowdhury - ~35s intro video (Remotion)",
   "scripts": {
     "start": "remotion studio index.ts",
-    "render:hd": "remotion render index.ts Intro out-HD.mp4 --codec=h264 --crf=16",
-    "render:4k": "remotion render index.ts Intro out-4K.mp4 --codec=h264 --crf=17 --scale=2",
-    "render:vertical": "remotion render index.ts IntroVertical out-Vertical-HD.mp4 --codec=h264 --crf=16",
-    "still": "remotion still index.ts Intro out-still.png --frame=150"
+    "render:hd": "remotion render index.ts Intro out-HD.mp4 --codec=h264 --crf=14",
+    "render:4k": "remotion render index.ts Intro out-4K.mp4 --codec=h264 --crf=15 --scale=2",
+    "render:vertical": "remotion render index.ts IntroVertical out-Vertical-HD.mp4 --codec=h264 --crf=14",
+    "still": "remotion still index.ts Intro out-still.png --frame=150",
+    "render:feed": "remotion render index.ts IntroFeed out-Feed-HD.mp4 --codec=h264 --crf=14",
+    "cover:wide": "remotion still index.ts CoverWide cover-wide.png",
+    "cover:vertical": "remotion still index.ts CoverVertical cover-vertical.png",
+    "cover:feed": "remotion still index.ts CoverFeed cover-feed.png"
   },
   "dependencies": {
     "@remotion/cli": "4.0.250",

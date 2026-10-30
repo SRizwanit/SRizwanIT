@@ -1,7 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
-import {C} from './theme';
+import {C, CONTACT} from './theme';
 import {F} from './fonts';
+import {Glyph, GlyphName} from './Icons';
 
 /* ------------------------------------------------------------------ */
 /* C1  GridBG — soft paper background, faint teal grid, drifting glow  */
@@ -106,7 +107,7 @@ export const BlurText: React.FC<BlurTextProps> = ({
 };
 
 /* ------------------------------------------------------------------ */
-/* C3  Badge — floating "+ label" glass pill                           */
+/* C3  Badge — floating "icon + label" glass pill (vector icon)                           */
 /* ------------------------------------------------------------------ */
 type BadgeProps = {
   text: string;
@@ -115,6 +116,7 @@ type BadgeProps = {
   bob?: number; // px amplitude
   style?: React.CSSProperties; // use for position (left/top ...)
   variant?: 'blue' | 'light';
+  icon?: GlyphName; // vector icon shown before the label (default: plus)
 };
 export const Badge: React.FC<BadgeProps> = ({
   text,
@@ -123,6 +125,7 @@ export const Badge: React.FC<BadgeProps> = ({
   bob = 8,
   style,
   variant = 'blue',
+  icon = 'plus',
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -151,14 +154,15 @@ export const Badge: React.FC<BadgeProps> = ({
         ...style,
       }}
     >
-      <span style={{fontSize: 34, lineHeight: 1}}>+</span>
+      <Glyph name={icon} size={32} color={light ? C.teal700 : C.white} stroke={3.6} />
       {text}
     </div>
   );
 };
 
 /* ------------------------------------------------------------------ */
-/* C4  PhoneMock — rounded phone, image scrolls inside                 */
+/* C4  PhoneMock — rounded phone with a real status bar; the screenshot */
+/* sits BELOW the status bar so the app header is never covered.        */
 /* ------------------------------------------------------------------ */
 type PhoneProps = {
   src: string;
@@ -169,6 +173,10 @@ type PhoneProps = {
   scrollStart?: number; // frame scroll begins
   scrollDuration?: number;
   tilt?: number; // deg
+  statusBg?: string; // status-bar colour = the colour at the top of the screenshot (seamless)
+  statusFg?: string; // colour of the status-bar icons
+  zoomTo?: number; // optional slow push-in (1 = off) while scrolling, so small text becomes readable
+  focusY?: number; // 0..1 of the image height the push-in zooms towards
   style?: React.CSSProperties;
 };
 export const PhoneMock: React.FC<PhoneProps> = ({
@@ -180,6 +188,10 @@ export const PhoneMock: React.FC<PhoneProps> = ({
   scrollStart = 20,
   scrollDuration = 120,
   tilt = 0,
+  statusBg = '#FFFFFF',
+  statusFg = C.teal900,
+  zoomTo = 1,
+  focusY = 0.5,
   style,
 }) => {
   const frame = useCurrentFrame();
@@ -188,39 +200,72 @@ export const PhoneMock: React.FC<PhoneProps> = ({
   const bezel = 14;
   const innerW = width - bezel * 2;
   const innerH = height - bezel * 2;
+  const SB = Math.max(26, Math.round(width * 0.085)); // status-bar height
+  const viewH = innerH - SB; // area where the screenshot is visible
   const imgH = innerW * imgRatio;
-  const maxScroll = Math.max(0, imgH - innerH);
+  const maxScroll = Math.max(0, imgH - viewH);
   const p = interpolate(frame - scrollStart, [0, scrollDuration], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
     easing: Easing.inOut(Easing.cubic),
   });
+  const z = 1 + (zoomTo - 1) * p;
+  const dot = SB * 0.17;
   return (
     <div
       style={{
         width,
         height,
         borderRadius: 54,
-        background: '#0b1514',
+        background: `linear-gradient(160deg, #13605A 0%, ${C.teal900} 100%)`,
         padding: bezel,
         boxSizing: 'border-box',
-        boxShadow: '0 40px 80px rgba(4,48,46,0.35), 0 0 0 2px rgba(255,255,255,0.12) inset',
+        boxShadow: '0 40px 80px rgba(4,48,46,0.35), 0 0 0 2px rgba(255,255,255,0.18) inset',
         opacity: Math.min(1, s * 1.4),
         transform: `translateY(${(1 - s) * 120}px) rotate(${tilt * s}deg) scale(${0.85 + 0.15 * s})`,
         ...style,
       }}
     >
-      <div style={{width: innerW, height: innerH, borderRadius: 42, overflow: 'hidden', position: 'relative', background: '#fff'}}>
-        <Img
-          src={src}
+      <div style={{width: innerW, height: innerH, borderRadius: 40, overflow: 'hidden', position: 'relative', background: statusBg}}>
+        {/* status bar (vector): signal - camera dot - battery */}
+        <div
           style={{
-            width: innerW,
-            height: imgH,
-            display: 'block',
-            transform: `translateY(${-maxScroll * p}px)`,
+            position: 'relative',
+            height: SB,
+            background: statusBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: `0 ${Math.round(SB * 0.95)}px`,
+            boxSizing: 'border-box',
           }}
-        />
-        <div style={{position: 'absolute', top: 10, left: '50%', width: 90, height: 8, marginLeft: -45, borderRadius: 8, background: 'rgba(4,48,46,0.55)'}} />
+        >
+          <svg width={SB * 0.62} height={SB * 0.4} viewBox="0 0 20 13">
+            <rect x="0" y="8" width="3.4" height="5" rx="1" fill={statusFg} />
+            <rect x="5.4" y="5" width="3.4" height="8" rx="1" fill={statusFg} />
+            <rect x="10.8" y="2.5" width="3.4" height="10.5" rx="1" fill={statusFg} />
+            <rect x="16.2" y="0" width="3.4" height="13" rx="1" fill={statusFg} />
+          </svg>
+          <div style={{position: 'absolute', left: '50%', top: '50%', width: dot * 2, height: dot * 2, marginLeft: -dot, marginTop: -dot, borderRadius: '50%', background: statusFg, opacity: 0.8}} />
+          <svg width={SB * 0.8} height={SB * 0.4} viewBox="0 0 26 13">
+            <rect x="0.8" y="0.8" width="21" height="11.4" rx="3.2" fill="none" stroke={statusFg} strokeWidth="1.5" />
+            <rect x="3" y="3" width="14" height="7" rx="1.6" fill={statusFg} />
+            <rect x="23.2" y="4" width="2.4" height="5" rx="1.1" fill={statusFg} />
+          </svg>
+        </div>
+        {/* screenshot: scrolls (and slowly pushes in) under the status bar */}
+        <div style={{position: 'relative', height: viewH, overflow: 'hidden', background: '#fff'}}>
+          <Img
+            src={src}
+            style={{
+              width: innerW,
+              height: imgH,
+              display: 'block',
+              transformOrigin: `50% ${focusY * 100}%`,
+              transform: `translateY(${-maxScroll * p}px) scale(${z})`,
+            }}
+          />
+        </div>
       </div>
     </div>
   );
@@ -405,3 +450,131 @@ export const ColorGrade: React.FC = () => (
     />
   </AbsoluteFill>
 );
+
+/* ------------------------------------------------------------------ */
+/* SkillCard — vector icon tile + name (same look as AppCard)          */
+/* ------------------------------------------------------------------ */
+export const SkillCard: React.FC<{icon: GlyphName; label: string; size?: number; delay?: number; bob?: number; labelSize?: number}> = ({
+  icon,
+  label,
+  size = 270,
+  delay = 0,
+  bob = 5,
+  labelSize = 34,
+}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const s = spring({frame: frame - delay, fps, config: {damping: 13, stiffness: 110}});
+  const y = Math.sin((frame + delay * 4) / 16) * bob;
+  return (
+    <div
+      style={{
+        width: size,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 18,
+        opacity: Math.min(1, s * 1.5),
+        transform: `translateY(${y + (1 - s) * 90}px) scale(${0.7 + 0.3 * s})`,
+      }}
+    >
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size * 0.16,
+          background: `linear-gradient(145deg, ${C.white} 0%, ${C.teal100} 100%)`,
+          boxShadow: '0 26px 56px rgba(4,48,46,0.22), 0 0 0 4px rgba(15,163,160,0.30), 0 0 56px rgba(94,234,212,0.45)',
+          border: `3px solid ${C.white}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Glyph name={icon} size={size * 0.5} color={C.teal700} stroke={3.2} />
+      </div>
+      <div style={{fontFamily: F.role, fontWeight: 800, fontSize: labelSize, color: C.teal900, textAlign: 'center', whiteSpace: 'nowrap', lineHeight: 1.2}}>{label}</div>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* StatChip — pill with a counting number ("7  Apps")                  */
+/* ------------------------------------------------------------------ */
+export const StatChip: React.FC<{value: number; label: string; delay?: number; fontSize?: number; style?: React.CSSProperties}> = ({
+  value,
+  label,
+  delay = 0,
+  fontSize = 38,
+  style,
+}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const s = spring({frame: frame - delay, fps, config: {damping: 12, stiffness: 130}});
+  const n = Math.round(
+    interpolate(frame - delay - 4, [0, 26], [0, value], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+      easing: Easing.out(Easing.cubic),
+    })
+  );
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 16,
+        padding: `${fontSize * 0.42}px ${fontSize * 0.95}px`,
+        borderRadius: 999,
+        background: `linear-gradient(135deg, ${C.teal500}, ${C.teal700})`,
+        border: '2px solid rgba(255,255,255,0.35)',
+        boxShadow: '0 18px 40px rgba(4,48,46,0.25)',
+        opacity: Math.min(1, s * 1.5),
+        transform: `scale(${0.6 + 0.4 * s})`,
+        ...style,
+      }}
+    >
+      <span style={{fontFamily: F.hello, fontWeight: 800, fontSize: fontSize * 1.6, lineHeight: 1, color: C.white, minWidth: fontSize * 0.9, textAlign: 'center'}}>{n}</span>
+      <span style={{fontFamily: F.tagline, fontWeight: 800, fontSize, color: C.teal100, lineHeight: 1}}>{label}</span>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* ContactRow — icons + text from CONTACT in theme.ts (empty = hidden) */
+/* ------------------------------------------------------------------ */
+export const ContactRow: React.FC<{start: number; size?: number; direction?: 'row' | 'column'; style?: React.CSSProperties}> = ({
+  start,
+  size = 34,
+  direction = 'column',
+  style,
+}) => {
+  const frame = useCurrentFrame();
+  if (CONTACT.length === 0) return null;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: direction,
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'center',
+        columnGap: size * 1.4,
+        rowGap: size * 0.45,
+        ...style,
+      }}
+    >
+      {CONTACT.map((c, i) => {
+        const p = interpolate(frame - start - i * 8, [0, 18], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+        return (
+          <div key={c.text + i} style={{display: 'flex', alignItems: 'center', gap: size * 0.4, opacity: p, transform: `translateY(${(1 - p) * 16}px)`}}>
+            <div style={{width: size * 1.6, height: size * 1.6, borderRadius: '50%', background: C.teal900, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+              <Glyph name={c.icon} size={size * 0.95} color={C.white} stroke={3.4} />
+            </div>
+            <div style={{fontFamily: F.tagline, fontWeight: 800, fontSize: size, color: C.teal900}}>{c.text}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};

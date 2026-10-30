@@ -4,10 +4,10 @@ import whoosh from './sfx-whoosh.wav';
 import pop from './sfx-pop.wav';
 import thud from './sfx-thud.wav';
 import ding from './sfx-ding.wav';
+import {APP_FIRST, APP_STAGGER, SKILL_FIRST, SKILL_STAGGER, START} from './theme';
 
-// All frames are ABSOLUTE (30 fps, 900 total).
-// Scene starts: S1 0 | S2 108 | S3 231 | S4 354 | S5 597 | S6 770
-// Change a number here to move a sound. Volume 0..1.
+// Every sound is placed RELATIVE to its scene (START comes from theme.ts), so when a scene
+// moves or a new scene is added the sounds follow automatically. 30 fps. Volume 0..1.
 type Hit = {at: number; src: string; vol: number; len: number};
 
 const hits: Hit[] = [
@@ -17,39 +17,39 @@ const hits: Hit[] = [
   {at: 40, src: pop, vol: 0.35, len: 10},
   {at: 49, src: pop, vol: 0.4, len: 10},
 
-  // transitions (whoosh starts a few frames before the cut)
-  {at: 102, src: whoosh, vol: 0.55, len: 20},
-  {at: 225, src: whoosh, vol: 0.6, len: 20},
-  {at: 348, src: whoosh, vol: 0.5, len: 20},
-  {at: 591, src: whoosh, vol: 0.6, len: 20},
-  {at: 764, src: whoosh, vol: 0.7, len: 20},
+  // transitions (whoosh starts a few frames before each cut)
+  {at: START.intro - 6, src: whoosh, vol: 0.55, len: 20},
+  {at: START.intro + 117, src: whoosh, vol: 0.6, len: 20},
+  {at: START.apps - 6, src: whoosh, vol: 0.5, len: 20},
+  {at: START.web - 6, src: whoosh, vol: 0.6, len: 20},
+  {at: START.skills - 6, src: whoosh, vol: 0.6, len: 20},
+  {at: START.outro - 6, src: whoosh, vol: 0.7, len: 20},
 
   // S2 — "Rizwan" name appears
-  {at: 152, src: ding, vol: 0.5, len: 30},
+  {at: START.intro + 44, src: ding, vol: 0.5, len: 30},
 
   // S3 — badges + CTA
-  {at: 257, src: pop, vol: 0.6, len: 10},
-  {at: 269, src: pop, vol: 0.6, len: 10},
-  {at: 289, src: ding, vol: 0.5, len: 30},
+  {at: START.intro + 149, src: pop, vol: 0.6, len: 10},
+  {at: START.intro + 161, src: pop, vol: 0.6, len: 10},
+  {at: START.intro + 181, src: ding, vol: 0.5, len: 30},
 
-  // S4 — 7 app cards pop in
-  {at: 368, src: pop, vol: 0.55, len: 10},
-  {at: 377, src: pop, vol: 0.55, len: 10},
-  {at: 386, src: pop, vol: 0.55, len: 10},
-  {at: 395, src: pop, vol: 0.55, len: 10},
-  {at: 404, src: pop, vol: 0.55, len: 10},
-  {at: 413, src: pop, vol: 0.55, len: 10},
-  {at: 422, src: pop, vol: 0.6, len: 10},
+  // S4 — 7 app cards pop in (same timing constants as the cards)
+  ...Array.from({length: 7}, (_, i): Hit => ({at: START.apps + APP_FIRST + i * APP_STAGGER, src: pop, vol: i === 6 ? 0.6 : 0.55, len: 10})),
 
   // S5 — 3 phones rise
-  {at: 597, src: pop, vol: 0.6, len: 10},
-  {at: 605, src: pop, vol: 0.6, len: 10},
-  {at: 613, src: pop, vol: 0.6, len: 10},
+  {at: START.web, src: pop, vol: 0.6, len: 10},
+  {at: START.web + 8, src: pop, vol: 0.6, len: 10},
+  {at: START.web + 16, src: pop, vol: 0.6, len: 10},
 
-  // S6 — "Don't DM Now." stamp, reply line, name
-  {at: 782, src: thud, vol: 0.95, len: 30},
-  {at: 810, src: ding, vol: 0.4, len: 30},
-  {at: 832, src: ding, vol: 0.5, len: 30},
+  // S6 — 5 skill cards pop in, then the two counters
+  ...Array.from({length: 5}, (_, i): Hit => ({at: START.skills + SKILL_FIRST + i * SKILL_STAGGER, src: pop, vol: 0.5, len: 10})),
+  {at: START.skills + 62, src: pop, vol: 0.55, len: 10},
+  {at: START.skills + 74, src: ding, vol: 0.45, len: 30},
+
+  // S7 — "Don't DM Now." stamp, reply line, name
+  {at: START.outro + 12, src: thud, vol: 0.95, len: 30},
+  {at: START.outro + 40, src: ding, vol: 0.4, len: 30},
+  {at: START.outro + 62, src: ding, vol: 0.5, len: 30},
 ];
 
 export const SfxTrack: React.FC = () => (
