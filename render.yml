@@ -1,0 +1,187 @@
+name: Render Rizwan Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "stills = preview frames only | hd | 4k | both"
+        type: choice
+        default: stills
+        options: [stills, hd, 4k, both]
+      release:
+        description: "Also publish the MP4(s) as a GitHub Release"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  NODE_OPTIONS: --max-old-space-size=6144
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required files exist in repo root
+        run: |
+          missing=0
+          for f in mypicture.jpg background.mp3 \
+            sfx-whoosh.wav sfx-pop.wav sfx-thud.wav sfx-ding.wav SfxTrack.tsx \
+            app-islami-bishwakosh-s2.jpg app-islami-bishwakosh.jpg app-shohidullah.jpg \
+            app-osman-goni.jpg app-tablig.jpg app-usila.jpg app-rizwantask.png \
+            web-islami-bishwakosh-s2.jpg web-islamipedia-ai.jpg web-rizwantask.jpg \
+            package.json index.ts Root.tsx Video.tsx Scenes.tsx Components.tsx \
+            AudioTrack.tsx theme.ts fonts.ts remotion.config.ts assets.d.ts; do
+            if [ ! -f "$f" ]; then echo "::error::MISSING FILE: $f"; missing=1; fi
+          done
+          exit $missing
+      - name: Build render matrix
+        id: m
+        run: |
+          mode="${{ github.event.inputs.mode }}"
+          HD='{"name":"HD","scale":1,"crf":14}'
+          K4='{"name":"4K","scale":2,"crf":15}'
+          case "$mode" in
+            hd)   m="{\"include\":[$HD]}" ;;
+            4k)   m="{\"include\":[$K4]}" ;;
+            both) m="{\"include\":[$HD,$K4]}" ;;
+            *)    m="{\"include\":[]}" ;;
+          esac
+          echo "matrix=$m" >> "$GITHUB_OUTPUT"
+
+  stills:
+    needs: preflight
+    if: ${{ github.event.inputs.mode == 'stills' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Chrome system libraries
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2t64 \
+            libxrandr2 libxkbcommon-x11-0 libxfixes3 libxcomposite1 libxdamage1 libatk-bridge2.0-0 \
+            libpango-1.0-0 libcairo2 libcups2 || true
+      - name: Auto-fix Remotion versions (keep pinned if it exists, else latest 4.x)
+        run: |
+          cat > "$RUNNER_TEMP/pin.js" <<'JS'
+          const {execSync} = require('child_process');
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const all = JSON.parse(execSync('npm view remotion versions --json', {encoding: 'utf8'}));
+          const v4 = all
+            .filter((v) => /^4\.\d+\.\d+$/.test(v))
+            .sort((a, b) => {
+              const x = a.split('.').map(Number), y = b.split('.').map(Number);
+              return x[1] - y[1] || x[2] - y[2];
+            });
+          const latest = v4[v4.length - 1];
+          const cur = pkg.dependencies.remotion;
+          const target = all.includes(cur) ? cur : latest;
+          for (const k of Object.keys(pkg.dependencies)) {
+            if (k === 'remotion' || k.startsWith('@remotion/')) pkg.dependencies[k] = target;
+          }
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          console.log('Pinned:', cur, '->', target, '(latest 4.x =', latest + ')');
+          JS
+          node "$RUNNER_TEMP/pin.js"
+      - run: npm install --no-audit --no-fund --legacy-peer-deps
+      - run: npx remotion browser ensure
+      - name: Composition sanity check
+        run: npx remotion compositions index.ts
+      - name: Render preview stills
+        run: |
+          # moments with the most on screen (scene starts: 0,108,231,354,597,770)
+          for f in 80 200 320 520 640 720 800 890; do
+            npx remotion still index.ts Intro "still-$(printf %03d $f).png" --frame=$f
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stills
+          path: still-*.png
+
+  render:
+    needs: preflight
+    if: ${{ github.event.inputs.mode != 'stills' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.preflight.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Chrome system libraries
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libnss3 libdbus-1-3 libatk1.0-0 libgbm-dev libasound2t64 \
+            libxrandr2 libxkbcommon-x11-0 libxfixes3 libxcomposite1 libxdamage1 libatk-bridge2.0-0 \
+            libpango-1.0-0 libcairo2 libcups2 || true
+      - name: Auto-fix Remotion versions (keep pinned if it exists, else latest 4.x)
+        run: |
+          cat > "$RUNNER_TEMP/pin.js" <<'JS'
+          const {execSync} = require('child_process');
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const all = JSON.parse(execSync('npm view remotion versions --json', {encoding: 'utf8'}));
+          const v4 = all
+            .filter((v) => /^4\.\d+\.\d+$/.test(v))
+            .sort((a, b) => {
+              const x = a.split('.').map(Number), y = b.split('.').map(Number);
+              return x[1] - y[1] || x[2] - y[2];
+            });
+          const latest = v4[v4.length - 1];
+          const cur = pkg.dependencies.remotion;
+          const target = all.includes(cur) ? cur : latest;
+          for (const k of Object.keys(pkg.dependencies)) {
+            if (k === 'remotion' || k.startsWith('@remotion/')) pkg.dependencies[k] = target;
+          }
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          console.log('Pinned:', cur, '->', target, '(latest 4.x =', latest + ')');
+          JS
+          node "$RUNNER_TEMP/pin.js"
+      - run: npm install --no-audit --no-fund --legacy-peer-deps
+      - run: npx remotion browser ensure
+      - name: Render ${{ matrix.name }}
+        run: |
+          npx remotion render index.ts Intro "Rizwan-${{ matrix.name }}.mp4" \
+            --codec=h264 --crf=${{ matrix.crf }} --scale=${{ matrix.scale }} \
+            --audio-codec=aac
+      - name: Show output info
+        run: |
+          ls -lh Rizwan-*.mp4
+          npx remotion ffprobe "Rizwan-${{ matrix.name }}.mp4" 2>&1 | grep -E "Duration|Stream" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Rizwan-${{ matrix.name }}
+          path: Rizwan-${{ matrix.name }}.mp4
+          retention-days: 14
+
+  release:
+    needs: render
+    if: ${{ github.event.inputs.release == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Rizwan-*
+          merge-multiple: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "video-${{ github.run_number }}" Rizwan-*.mp4 \
+            --repo "${{ github.repository }}" \
+            --title "Rizwan Video #${{ github.run_number }}" \
+            --notes "Rendered by GitHub Actions (mode: ${{ github.event.inputs.mode }})."

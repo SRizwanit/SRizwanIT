@@ -1,0 +1,25 @@
+{
+  "name": "rizwan-intro-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rizwan Chowdhury - 30s intro video (Remotion)",
+  "scripts": {
+    "start": "remotion studio index.ts",
+    "render:hd": "remotion render index.ts Intro out-HD.mp4 --codec=h264 --crf=16",
+    "render:4k": "remotion render index.ts Intro out-4K.mp4 --codec=h264 --crf=17 --scale=2",
+    "render:vertical": "remotion render index.ts IntroVertical out-Vertical-HD.mp4 --codec=h264 --crf=16",
+    "still": "remotion still index.ts Intro out-still.png --frame=150"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.250",
+    "@remotion/google-fonts": "4.0.250",
+    "@remotion/transitions": "4.0.250",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.250"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
